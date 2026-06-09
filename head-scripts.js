@@ -1,4 +1,3 @@
-<script>
 document.addEventListener('DOMContentLoaded', function() {
   (function() {
     var target = document.getElementById('details-widgets');
@@ -170,4 +169,3 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   })();
 });
-</script>
