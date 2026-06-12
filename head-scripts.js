@@ -3,6 +3,8 @@ document.addEventListener('DOMContentLoaded', function() {
     var target = document.getElementById('details-widgets');
     if (!target) return;
 
+    if (window.location.pathname.indexOf('/roughriders/riders-community-discussion/') !== -1) return;
+
     var path = window.location.pathname;
     var isRiders = path.indexOf('/roughriders') === 0 || path.indexOf('/football') === 0 || path.indexOf('/cfl') === 0;
 
