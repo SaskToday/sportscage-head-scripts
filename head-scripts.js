@@ -3,8 +3,6 @@ document.addEventListener('DOMContentLoaded', function() {
     var target = document.getElementById('details-widgets');
     if (!target) return;
 
-    if (window.location.pathname.indexOf('/roughriders/riders-community-discussion/') !== -1) return;
-
     var path = window.location.pathname;
     var isRiders = path.indexOf('/roughriders') === 0 || path.indexOf('/football') === 0 || path.indexOf('/cfl') === 0;
 
@@ -171,7 +169,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   })();
 
-  (function() {
+  (function () {
     function isRbnLiveWindow() {
       var now = Date.now();
       var year = new Date().getFullYear();
@@ -180,152 +178,236 @@ document.addEventListener('DOMContentLoaded', function() {
       return now >= start && now < end;
     }
 
-    function injectRbnLiveBanner() {
+    function getBannerHeight() {
+      return window.matchMedia('(max-width: 991px)').matches ? 38 : 42;
+    }
+
+    function syncBodyOffset() {
+      var header = document.querySelector('header');
+      var bodyContainer = document.getElementById('body-container');
+      if (!header || !bodyContainer) return;
+      bodyContainer.style.setProperty('margin-top', header.offsetHeight + 'px', 'important');
+    }
+
+    function bindLayoutSync() {
+      var resizeTimer;
+      window.addEventListener('resize', function () {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function () {
+          var banner = document.getElementById('sc-rbn-live-banner-v2');
+          var height = getBannerHeight();
+          if (banner) {
+            banner.style.setProperty('--sc-rbn-banner-height', height + 'px');
+          }
+          document.documentElement.style.setProperty('--sc-rbn-banner-height', height + 'px');
+          syncBodyOffset();
+        }, 100);
+      });
+
+      if (window.MutationObserver) {
+        var observer = new MutationObserver(syncBodyOffset);
+        observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+
+        var header = document.querySelector('header');
+        if (header) {
+          observer.observe(header, { childList: true, subtree: true, attributes: true });
+        }
+      }
+    }
+
+    function injectRbnLiveBannerV2() {
       if (!isRbnLiveWindow()) return;
+      if (!document.body || document.getElementById('sc-rbn-live-banner-v2')) return;
 
-      var path = window.location.pathname.replace(/\/+$/, '');
-      if (path !== '' && path !== '/index') return;
-
-      var target = document.querySelector('#body .row.landing-two-col > section.col-md-8')
-        || document.querySelector('#body > .row > section.col-md-8')
-        || document.querySelector('section.col-md-8');
-
-      if (!target || document.getElementById('sc-rbn-live-banner')) return;
+      var bannerHeight = getBannerHeight();
 
       var style = document.createElement('style');
       style.type = 'text/css';
       style.textContent = [
-        '.sc-rbn-live-banner {',
+        '.sc-rbn-live-banner-v2 {',
         '  --sc-green: #016a1b;',
         '  --sc-green-dark: #014814;',
+        '  --sc-rbn-banner-height: 42px;',
         '  display: block;',
-        '  margin: 0 0 18px;',
-        '  padding: 0;',
-        '  text-decoration: none !important;',
-        '  color: #fff;',
-        '  border-radius: 4px;',
-        '  overflow: hidden;',
+        '  width: 100%;',
+        '  height: var(--sc-rbn-banner-height);',
         '  background: var(--sc-green);',
-        '  border: 1px solid var(--sc-green-dark);',
-        '  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);',
-        '  transition: background 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;',
+        '  border-bottom: 1px solid var(--sc-green-dark);',
+        '  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);',
         '}',
-        '.sc-rbn-live-banner:hover,',
-        '.sc-rbn-live-banner:focus {',
-        '  text-decoration: none !important;',
-        '  color: #fff;',
-        '  background: var(--sc-green-dark);',
-        '  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);',
-        '  transform: translateY(-1px);',
+        '.sc-rbn-live-banner-v2:hover { background: var(--sc-green-dark); }',
+        '.sc-rbn-live-banner-v2__container {',
+        '  max-width: 990px;',
+        '  height: 100%;',
+        '  margin: 0 auto;',
+        '  padding: 0 15px;',
         '}',
-        '.sc-rbn-live-banner__inner {',
+        '.sc-rbn-live-banner-v2__link {',
         '  display: flex;',
         '  align-items: center;',
-        '  gap: 14px;',
-        '  padding: 7px 16px;',
+        '  height: 100%;',
+        '  text-decoration: none !important;',
+        '  color: #fff;',
         '}',
-        '.sc-rbn-live-banner__icon {',
+        '.sc-rbn-live-banner-v2__link:hover,',
+        '.sc-rbn-live-banner-v2__link:focus {',
+        '  text-decoration: none !important;',
+        '  color: #fff;',
+        '}',
+        '.sc-rbn-live-banner-v2__inner {',
+        '  display: flex;',
+        '  align-items: center;',
+        '  gap: 12px;',
+        '  width: 100%;',
+        '  min-width: 0;',
+        '}',
+        '.sc-rbn-live-banner-v2__icon {',
         '  flex: 0 0 auto;',
         '  display: block;',
-        '  width: 34px;',
-        '  height: 34px;',
+        '  width: 28px;',
+        '  height: 28px;',
         '}',
-        '.sc-rbn-live-banner__icon svg {',
+        '.sc-rbn-live-banner-v2__icon svg {',
         '  display: block;',
-        '  width: 34px;',
-        '  height: 34px;',
+        '  width: 28px;',
+        '  height: 28px;',
         '}',
-        '.sc-rbn-live-banner__signal {',
+        '.sc-rbn-live-banner-v2__signal {',
         '  transform-box: fill-box;',
         '  transform-origin: center;',
         '}',
-        '.sc-rbn-live-banner__signal--inner {',
+        '.sc-rbn-live-banner-v2__signal--inner {',
         '  fill: rgba(255, 255, 255, 0.45);',
-        '  animation: sc-rbn-signal-inner 2s ease-in-out infinite;',
+        '  animation: sc-rbn-v2-signal-inner 2s ease-in-out infinite;',
         '}',
-        '.sc-rbn-live-banner__signal--outer {',
+        '.sc-rbn-live-banner-v2__signal--outer {',
         '  fill: rgba(255, 255, 255, 0.75);',
-        '  animation: sc-rbn-signal-outer 2s ease-in-out infinite;',
+        '  animation: sc-rbn-v2-signal-outer 2s ease-in-out infinite;',
         '}',
-        '.sc-rbn-live-banner__tower { fill: #fff; }',
-        '.sc-rbn-live-banner__text {',
+        '.sc-rbn-live-banner-v2__tower { fill: #fff; }',
+        '.sc-rbn-live-banner-v2__ticker {',
         '  flex: 1 1 auto;',
         '  min-width: 0;',
-        '  font-family: "Source Sans 3", sans-serif;',
+        '  overflow: hidden;',
+        '  height: 100%;',
+        '  display: flex;',
+        '  align-items: center;',
+        '}',
+        '.sc-rbn-live-banner-v2__track {',
+        '  display: flex;',
+        '  width: max-content;',
+        '  animation: sc-rbn-v2-ticker 18s linear infinite;',
+        '}',
+        '.sc-rbn-live-banner-v2__track span {',
+        '  flex: 0 0 auto;',
+        '  padding-right: 3rem;',
+        '  font-family: "beachwood-variable", sans-serif;',
         '  font-size: 13px;',
         '  font-weight: 600;',
-        '  letter-spacing: 0.06em;',
-        '  line-height: 1.35;',
-        '  text-transform: uppercase;',
-        '  color: #fff;',
-        '}',
-        '.sc-rbn-live-banner__cta { color: #fff; white-space: nowrap; text-decoration: underline; text-underline-offset: 2px; }',
-        '.sc-rbn-live-banner__arrow {',
-        '  flex: 0 0 auto;',
-        '  color: #fff;',
-        '  font-size: 18px;',
+        '  letter-spacing: 0.08em;',
         '  line-height: 1;',
-        '  opacity: 0.75;',
-        '  transition: transform 0.2s ease, opacity 0.2s ease;',
+        '  text-transform: uppercase;',
+        '  white-space: nowrap;',
+        '  color: #fff;',
         '}',
-        '.sc-rbn-live-banner:hover .sc-rbn-live-banner__arrow,',
-        '.sc-rbn-live-banner:focus .sc-rbn-live-banner__arrow {',
-        '  transform: translateX(3px);',
-        '  opacity: 1;',
-        '}',
-        '@keyframes sc-rbn-signal-inner {',
+        '@keyframes sc-rbn-v2-signal-inner {',
         '  0%, 100% { opacity: 0.35; transform: scale(0.92); }',
         '  20% { opacity: 1; transform: scale(1); }',
         '  45% { opacity: 0.35; transform: scale(1); }',
         '}',
-        '@keyframes sc-rbn-signal-outer {',
+        '@keyframes sc-rbn-v2-signal-outer {',
         '  0%, 100% { opacity: 0.4; transform: scale(0.88); }',
         '  20% { opacity: 0.4; transform: scale(0.88); }',
         '  45% { opacity: 1; transform: scale(1); }',
         '  70% { opacity: 0.4; transform: scale(1.04); }',
         '}',
+        '@keyframes sc-rbn-v2-ticker {',
+        '  0% { transform: translateX(0); }',
+        '  100% { transform: translateX(-33.333%); }',
+        '}',
+        '@media (max-width: 991px) {',
+        '  .sc-rbn-live-banner-v2 { --sc-rbn-banner-height: 38px; }',
+        '  body.sc-rbn-live-banner-v2-active .sc-rbn-live-banner-v2 {',
+        '    position: fixed;',
+        '    top: 0;',
+        '    left: 0;',
+        '    right: 0;',
+        '    z-index: 25;',
+        '  }',
+        '  body.sc-rbn-live-banner-v2-active header {',
+        '    padding-top: var(--sc-rbn-banner-height);',
+        '    top: 0 !important;',
+        '  }',
+        '  body.sc-rbn-live-banner-v2-active.scroll header,',
+        '  body.sc-rbn-live-banner-v2-active.scrollup header {',
+        '    top: 0 !important;',
+        '  }',
+        '}',
         '@media (max-width: 575px) {',
-        '  .sc-rbn-live-banner__inner { padding: 11px 12px; gap: 10px; }',
-        '  .sc-rbn-live-banner__text { font-size: 11px; letter-spacing: 0.04em; }',
-        '  .sc-rbn-live-banner__arrow { display: none; }',
+        '  .sc-rbn-live-banner-v2__container { max-width: none; padding: 0 10px; }',
+        '  .sc-rbn-live-banner-v2__inner { gap: 8px; }',
+        '  .sc-rbn-live-banner-v2__icon,',
+        '  .sc-rbn-live-banner-v2__icon svg { width: 24px; height: 24px; }',
+        '  .sc-rbn-live-banner-v2__track span { font-size: 11px; letter-spacing: 0.05em; padding-right: 2rem; }',
+        '  .sc-rbn-live-banner-v2__track { animation-duration: 14s; }',
         '}',
         '@media (prefers-reduced-motion: reduce) {',
-        '  .sc-rbn-live-banner__signal { animation: none; }',
-        '  .sc-rbn-live-banner__signal--inner { opacity: 0.7; transform: none; }',
-        '  .sc-rbn-live-banner__signal--outer { opacity: 0.9; transform: none; }',
+        '  .sc-rbn-live-banner-v2__signal { animation: none; }',
+        '  .sc-rbn-live-banner-v2__signal--inner { opacity: 0.7; transform: none; }',
+        '  .sc-rbn-live-banner-v2__signal--outer { opacity: 0.9; transform: none; }',
+        '  .sc-rbn-live-banner-v2__track { animation: none; transform: none; }',
         '}'
       ].join('\n');
 
       document.head.appendChild(style);
 
-      var banner = document.createElement('a');
-      banner.id = 'sc-rbn-live-banner';
-      banner.className = 'sc-rbn-live-banner';
-      banner.href = 'https://listen.streamon.fm/ckrm';
-      banner.target = '_blank';
-      banner.rel = 'noopener noreferrer';
-      banner.setAttribute('aria-label', 'Rider Broadcast Network is live. Tune in now on 620 CKRM.');
+      var tickerText = 'Riders vs Stampeders live - stream now';
+
+      var banner = document.createElement('div');
+      banner.id = 'sc-rbn-live-banner-v2';
+      banner.className = 'sc-rbn-live-banner-v2';
+      banner.style.setProperty('--sc-rbn-banner-height', bannerHeight + 'px');
+      document.documentElement.style.setProperty('--sc-rbn-banner-height', bannerHeight + 'px');
       banner.innerHTML = [
-        '<div class="sc-rbn-live-banner__inner">',
-        '  <span class="sc-rbn-live-banner__icon" aria-hidden="true">',
-        '    <svg viewBox="0 0 193.5 177.1" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">',
-        '      <path class="sc-rbn-live-banner__signal sc-rbn-live-banner__signal--outer" d="M55.3,156.1c-25.3-14.5-42.3-41.7-42.3-72.9S29.3,26,53.7,11.3L47.2,0C18.9,17,0,47.9,0,83.2s19.7,67.6,49,84.3l6.3-11.4Z"/>',
-        '      <path class="sc-rbn-live-banner__signal sc-rbn-live-banner__signal--outer" d="M138.2,156.1c25.3-14.5,42.3-41.7,42.3-72.9,0-30.5-16.3-57.2-40.7-71.9l6.5-11.3c28.3,17,47.2,47.9,47.2,83.2,0,36.1-19.7,67.6-49,84.3l-6.3-11.4Z"/>',
-        '      <path class="sc-rbn-live-banner__signal sc-rbn-live-banner__signal--inner" d="M72.1,127.2c-15.1-8.6-25.3-24.8-25.3-43.4s9.8-34.1,24.3-42.8l-6.4-11.4c-18.5,11-30.9,31.1-30.9,54.2s12.9,44,32,54.8l6.3-11.4Z"/>',
-        '      <path class="sc-rbn-live-banner__signal sc-rbn-live-banner__signal--inner" d="M121.4,127.2c15.1-8.6,25.3-24.8,25.3-43.4,0-18.2-9.8-34.1-24.3-42.8l6.4-11.4c18.5,11,30.9,31.1,30.9,54.2s-12.9,44-32,54.8l-6.3-11.4Z"/>',
-        '      <path class="sc-rbn-live-banner__tower" d="M119.3,82.9c0-12.5-10.1-22.6-22.6-22.6s-22.6,10.1-22.6,22.6,6,17.8,14.4,21.1l-12.4,63.3c0,5.4,4.4,9.8,9.8,9.8h21.7c5.4,0,9.8-4.4,9.8-9.8l-12.7-63.2c8.6-3.2,14.7-11.5,14.7-21.2Z"/>',
-        '    </svg>',
-        '  </span>',
-        '  <span class="sc-rbn-live-banner__text">',
-        '    Rider Broadcast Network is live. <span class="sc-rbn-live-banner__cta">Tune in now!</span>',
-        '  </span>',
-        '  <span class="sc-rbn-live-banner__arrow" aria-hidden="true">&#8250;</span>',
+        '<div class="sc-rbn-live-banner-v2__container">',
+        '  <a class="sc-rbn-live-banner-v2__link" href="https://listen.streamon.fm/ckrm" target="_blank" rel="noopener noreferrer" aria-label="' + tickerText + '. Opens live stream in a new tab.">',
+        '    <div class="sc-rbn-live-banner-v2__inner">',
+        '      <span class="sc-rbn-live-banner-v2__icon" aria-hidden="true">',
+        '        <svg viewBox="0 0 193.5 177.1" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">',
+        '          <path class="sc-rbn-live-banner-v2__signal sc-rbn-live-banner-v2__signal--outer" d="M55.3,156.1c-25.3-14.5-42.3-41.7-42.3-72.9S29.3,26,53.7,11.3L47.2,0C18.9,17,0,47.9,0,83.2s19.7,67.6,49,84.3l6.3-11.4Z"/>',
+        '          <path class="sc-rbn-live-banner-v2__signal sc-rbn-live-banner-v2__signal--outer" d="M138.2,156.1c25.3-14.5,42.3-41.7,42.3-72.9,0-30.5-16.3-57.2-40.7-71.9l6.5-11.3c28.3,17,47.2,47.9,47.2,83.2,0,36.1-19.7,67.6-49,84.3l-6.3-11.4Z"/>',
+        '          <path class="sc-rbn-live-banner-v2__signal sc-rbn-live-banner-v2__signal--inner" d="M72.1,127.2c-15.1-8.6-25.3-24.8-25.3-43.4s9.8-34.1,24.3-42.8l-6.4-11.4c-18.5,11-30.9,31.1-30.9,54.2s12.9,44,32,54.8l6.3-11.4Z"/>',
+        '          <path class="sc-rbn-live-banner-v2__signal sc-rbn-live-banner-v2__signal--inner" d="M121.4,127.2c15.1-8.6,25.3-24.8,25.3-43.4,0-18.2-9.8-34.1-24.3-42.8l6.4-11.4c18.5,11,30.9,31.1,30.9,54.2s-12.9,44-32,54.8l-6.3-11.4Z"/>',
+        '          <path class="sc-rbn-live-banner-v2__tower" d="M119.3,82.9c0-12.5-10.1-22.6-22.6-22.6s-22.6,10.1-22.6,22.6,6,17.8,14.4,21.1l-12.4,63.3c0,5.4,4.4,9.8,9.8,9.8h21.7c5.4,0,9.8-4.4,9.8-9.8l-12.7-63.2c8.6-3.2,14.7-11.5,14.7-21.2Z"/>',
+        '        </svg>',
+        '      </span>',
+        '      <div class="sc-rbn-live-banner-v2__ticker" aria-hidden="true">',
+        '        <div class="sc-rbn-live-banner-v2__track">',
+        '          <span>' + tickerText + '</span>',
+        '          <span>' + tickerText + '</span>',
+        '          <span>' + tickerText + '</span>',
+        '        </div>',
+        '      </div>',
+        '    </div>',
+        '  </a>',
         '</div>'
       ].join('');
 
-      target.insertBefore(banner, target.firstChild);
+      var header = document.querySelector('header');
+      if (header) {
+        header.insertBefore(banner, header.firstChild);
+      } else {
+        document.body.insertBefore(banner, document.body.firstChild);
+      }
+
+      document.body.classList.add('sc-rbn-live-banner-v2-active');
+      syncBodyOffset();
+      bindLayoutSync();
+
+      window.setTimeout(syncBodyOffset, 250);
+      window.setTimeout(syncBodyOffset, 1000);
     }
 
-    injectRbnLiveBanner();
+    injectRbnLiveBannerV2();
   })();
 });
