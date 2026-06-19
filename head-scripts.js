@@ -361,7 +361,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
       document.head.appendChild(style);
 
-      var tickerText = 'Riders vs Stampeders live - stream now';
+      var tickerText = 'Riders vs Stampeders live at 620 CKRM - Stream now';
 
       var banner = document.createElement('div');
       banner.id = 'sc-rbn-live-banner-v2';
