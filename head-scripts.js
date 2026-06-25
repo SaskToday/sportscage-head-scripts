@@ -3,6 +3,8 @@ document.addEventListener('DOMContentLoaded', function() {
     var target = document.getElementById('details-widgets');
     if (!target) return;
 
+    if (window.location.pathname.indexOf('/roughriders/riders-community-discussion/') !== -1) return;
+
     var path = window.location.pathname;
     var isRiders = path.indexOf('/roughriders') === 0 || path.indexOf('/football') === 0 || path.indexOf('/cfl') === 0;
 
@@ -169,24 +171,38 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   })();
 
-  (function () {
+  (function() {
     function isRbnLiveWindow() {
-      var now = Date.now();
-      var year = new Date().getFullYear();
-      var start = Date.parse(year + '-06-20T14:00:00-07:00');
-      var end = Date.parse(year + '-06-20T22:00:00-07:00');
-      return now >= start && now < end;
+      var start = Date.parse('2026-06-26T18:00:00-04:00');
+      var end = Date.parse('2026-06-27T00:00:00-04:00');
+      return Date.now() >= start && Date.now() < end;
+    }
+
+    function isMobileLayout() {
+      return window.matchMedia('(max-width: 991px)').matches;
     }
 
     function getBannerHeight() {
-      return window.matchMedia('(max-width: 991px)').matches ? 38 : 42;
+      return isMobileLayout() ? 38 : 42;
     }
 
     function syncBodyOffset() {
       var header = document.querySelector('header');
       var bodyContainer = document.getElementById('body-container');
-      if (!header || !bodyContainer) return;
-      bodyContainer.style.setProperty('margin-top', header.offsetHeight + 'px', 'important');
+      if (!bodyContainer) return;
+
+      if (isMobileLayout()) {
+        bodyContainer.style.setProperty('margin-top', '0', 'important');
+        return;
+      }
+
+      if (header) {
+        bodyContainer.style.setProperty(
+          'margin-top',
+          getBannerHeight() + header.offsetHeight + 'px',
+          'important'
+        );
+      }
     }
 
     function bindLayoutSync() {
@@ -215,11 +231,29 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
 
+    function buildTickerSegmentHtml() {
+      var footballIcon =
+        '<span class="sc-rbn-live-banner-v2__football" aria-hidden="true">' +
+        '<i class="fa-solid fa-football"></i>' +
+        '</span>';
+
+      return (
+        '<span class="sc-rbn-live-banner-v2__segment">' +
+        'Argonauts vs Riders live' +
+        footballIcon +
+        'click to watch now &raquo;&raquo;' +
+        '</span>'
+      );
+    }
+
     function injectRbnLiveBannerV2() {
       if (!isRbnLiveWindow()) return;
+
       if (!document.body || document.getElementById('sc-rbn-live-banner-v2')) return;
 
       var bannerHeight = getBannerHeight();
+      var tickerSegment = buildTickerSegmentHtml();
+      var ariaLabel = 'Argonauts vs Riders live - click to watch now. Opens live stream in a new tab.';
 
       var style = document.createElement('style');
       style.type = 'text/css';
@@ -298,8 +332,11 @@ document.addEventListener('DOMContentLoaded', function() {
         '  width: max-content;',
         '  animation: sc-rbn-v2-ticker 18s linear infinite;',
         '}',
-        '.sc-rbn-live-banner-v2__track span {',
+        '.sc-rbn-live-banner-v2__segment {',
         '  flex: 0 0 auto;',
+        '  display: inline-flex;',
+        '  align-items: center;',
+        '  gap: 0.65rem;',
         '  padding-right: 3rem;',
         '  font-family: "beachwood-variable", sans-serif;',
         '  font-size: 13px;',
@@ -309,6 +346,17 @@ document.addEventListener('DOMContentLoaded', function() {
         '  text-transform: uppercase;',
         '  white-space: nowrap;',
         '  color: #fff;',
+        '}',
+        '.sc-rbn-live-banner-v2__football {',
+        '  display: inline-flex;',
+        '  align-items: center;',
+        '  justify-content: center;',
+        '  flex: 0 0 auto;',
+        '  color: rgba(255, 255, 255, 0.92);',
+        '}',
+        '.sc-rbn-live-banner-v2__football i {',
+        '  font-size: 14px;',
+        '  line-height: 1;',
         '}',
         '@keyframes sc-rbn-v2-signal-inner {',
         '  0%, 100% { opacity: 0.35; transform: scale(0.92); }',
@@ -325,8 +373,23 @@ document.addEventListener('DOMContentLoaded', function() {
         '  0% { transform: translateX(0); }',
         '  100% { transform: translateX(-33.333%); }',
         '}',
+        '@media (min-width: 992px) {',
+        '  body.sc-rbn-live-banner-v2-active .sc-rbn-live-banner-v2 {',
+        '    position: fixed;',
+        '    top: 0;',
+        '    left: 0;',
+        '    right: 0;',
+        '    z-index: 30;',
+        '  }',
+        '  body.sc-rbn-live-banner-v2-active header {',
+        '    top: var(--sc-rbn-banner-height) !important;',
+        '  }',
+        '}',
         '@media (max-width: 991px) {',
         '  .sc-rbn-live-banner-v2 { --sc-rbn-banner-height: 38px; }',
+        '  body.sc-rbn-live-banner-v2-active {',
+        '    padding-top: var(--sc-rbn-banner-height);',
+        '  }',
         '  body.sc-rbn-live-banner-v2-active .sc-rbn-live-banner-v2 {',
         '    position: fixed;',
         '    top: 0;',
@@ -335,12 +398,12 @@ document.addEventListener('DOMContentLoaded', function() {
         '    z-index: 25;',
         '  }',
         '  body.sc-rbn-live-banner-v2-active header {',
-        '    padding-top: var(--sc-rbn-banner-height);',
-        '    top: 0 !important;',
+        '    position: static !important;',
+        '    top: auto !important;',
+        '    padding-top: 0 !important;',
         '  }',
-        '  body.sc-rbn-live-banner-v2-active.scroll header,',
-        '  body.sc-rbn-live-banner-v2-active.scrollup header {',
-        '    top: 0 !important;',
+        '  body.sc-rbn-live-banner-v2-active #body-container {',
+        '    margin-top: 0 !important;',
         '  }',
         '}',
         '@media (max-width: 575px) {',
@@ -348,7 +411,8 @@ document.addEventListener('DOMContentLoaded', function() {
         '  .sc-rbn-live-banner-v2__inner { gap: 8px; }',
         '  .sc-rbn-live-banner-v2__icon,',
         '  .sc-rbn-live-banner-v2__icon svg { width: 24px; height: 24px; }',
-        '  .sc-rbn-live-banner-v2__track span { font-size: 11px; letter-spacing: 0.05em; padding-right: 2rem; }',
+        '  .sc-rbn-live-banner-v2__segment { font-size: 11px; letter-spacing: 0.05em; padding-right: 2rem; gap: 0.5rem; }',
+        '  .sc-rbn-live-banner-v2__football i { font-size: 12px; }',
         '  .sc-rbn-live-banner-v2__track { animation-duration: 14s; }',
         '}',
         '@media (prefers-reduced-motion: reduce) {',
@@ -361,8 +425,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
       document.head.appendChild(style);
 
-      var tickerText = 'Riders vs Stampeders live at 620 CKRM - Stream now';
-
       var banner = document.createElement('div');
       banner.id = 'sc-rbn-live-banner-v2';
       banner.className = 'sc-rbn-live-banner-v2';
@@ -370,7 +432,7 @@ document.addEventListener('DOMContentLoaded', function() {
       document.documentElement.style.setProperty('--sc-rbn-banner-height', bannerHeight + 'px');
       banner.innerHTML = [
         '<div class="sc-rbn-live-banner-v2__container">',
-        '  <a class="sc-rbn-live-banner-v2__link" href="https://listen.streamon.fm/ckrm" target="_blank" rel="noopener noreferrer" aria-label="' + tickerText + '. Opens live stream in a new tab.">',
+        '  <a class="sc-rbn-live-banner-v2__link" href="https://youtube.com/live/G7sMG3UuiS8?feature=share" target="_blank" rel="noopener noreferrer" aria-label="' + ariaLabel + '">',
         '    <div class="sc-rbn-live-banner-v2__inner">',
         '      <span class="sc-rbn-live-banner-v2__icon" aria-hidden="true">',
         '        <svg viewBox="0 0 193.5 177.1" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">',
@@ -383,9 +445,9 @@ document.addEventListener('DOMContentLoaded', function() {
         '      </span>',
         '      <div class="sc-rbn-live-banner-v2__ticker" aria-hidden="true">',
         '        <div class="sc-rbn-live-banner-v2__track">',
-        '          <span>' + tickerText + '</span>',
-        '          <span>' + tickerText + '</span>',
-        '          <span>' + tickerText + '</span>',
+        '          ' + tickerSegment,
+        '          ' + tickerSegment,
+        '          ' + tickerSegment,
         '        </div>',
         '      </div>',
         '    </div>',
@@ -394,8 +456,8 @@ document.addEventListener('DOMContentLoaded', function() {
       ].join('');
 
       var header = document.querySelector('header');
-      if (header) {
-        header.insertBefore(banner, header.firstChild);
+      if (header && header.parentNode) {
+        header.parentNode.insertBefore(banner, header);
       } else {
         document.body.insertBefore(banner, document.body.firstChild);
       }
