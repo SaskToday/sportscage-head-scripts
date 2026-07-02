@@ -173,8 +173,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
   (function() {
     function isRbnLiveWindow() {
-      var start = Date.parse('2026-06-26T18:00:00-04:00');
-      var end = Date.parse('2026-06-27T00:00:00-04:00');
+      // Production window: July 3, 2026 4:30 PM ET – July 4, 2026 12:01 AM ET
+      var start = Date.parse('2026-07-03T16:30:00-04:00');
+      var end = Date.parse('2026-07-04T00:01:00-04:00');
       return Date.now() >= start && Date.now() < end;
     }
 
@@ -239,9 +240,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
       return (
         '<span class="sc-rbn-live-banner-v2__segment">' +
-        'Argonauts vs Riders live' +
+        'Riders vs Redblacks' +
         footballIcon +
-        'click to watch now &raquo;&raquo;' +
+        'Click to watch the Rider Broadcast Network live now >>' +
         '</span>'
       );
     }
@@ -253,7 +254,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
       var bannerHeight = getBannerHeight();
       var tickerSegment = buildTickerSegmentHtml();
-      var ariaLabel = 'Argonauts vs Riders live - click to watch now. Opens live stream in a new tab.';
+      var ariaLabel = 'Riders vs Redblacks - Click to watch the Rider Broadcast Network live now. Opens live stream in a new tab.';
 
       var style = document.createElement('style');
       style.type = 'text/css';
@@ -432,7 +433,7 @@ document.addEventListener('DOMContentLoaded', function() {
       document.documentElement.style.setProperty('--sc-rbn-banner-height', bannerHeight + 'px');
       banner.innerHTML = [
         '<div class="sc-rbn-live-banner-v2__container">',
-        '  <a class="sc-rbn-live-banner-v2__link" href="https://youtube.com/live/G7sMG3UuiS8?feature=share" target="_blank" rel="noopener noreferrer" aria-label="' + ariaLabel + '">',
+        '  <a class="sc-rbn-live-banner-v2__link" href="https://www.youtube.com/live/z5NqM0m2Ji4" target="_blank" rel="noopener noreferrer" aria-label="' + ariaLabel + '">',
         '    <div class="sc-rbn-live-banner-v2__inner">',
         '      <span class="sc-rbn-live-banner-v2__icon" aria-hidden="true">',
         '        <svg viewBox="0 0 193.5 177.1" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">',
