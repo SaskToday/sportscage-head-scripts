@@ -172,11 +172,21 @@ document.addEventListener('DOMContentLoaded', function() {
   })();
 
   (function() {
+    // v4: Mobile banner is fixed at the top and reserves its height by offsetting the
+    // fixed header and #body-container margin — no body padding-top, so ad units are
+    // not hidden underneath.
     function isRbnLiveWindow() {
+      // Temporary: limit banner to /baseball pages for live-site testing.
+      if (window.location.pathname.indexOf('/baseball') === -1) {
+        return false;
+      }
+
       // Production window: July 3, 2026 4:30 PM ET – July 4, 2026 12:01 AM ET
-      var start = Date.parse('2026-07-03T16:30:00-04:00');
-      var end = Date.parse('2026-07-04T00:01:00-04:00');
-      return Date.now() >= start && Date.now() < end;
+      // var start = Date.parse('2026-07-03T16:30:00-04:00');
+      // var end = Date.parse('2026-07-04T00:01:00-04:00');
+      // return Date.now() >= start && Date.now() < end;
+
+      return true; // Testing: always show banner on /baseball pages
     }
 
     function isMobileLayout() {
@@ -190,20 +200,13 @@ document.addEventListener('DOMContentLoaded', function() {
     function syncBodyOffset() {
       var header = document.querySelector('header');
       var bodyContainer = document.getElementById('body-container');
-      if (!bodyContainer) return;
+      if (!header || !bodyContainer) return;
 
-      if (isMobileLayout()) {
-        bodyContainer.style.setProperty('margin-top', '0', 'important');
-        return;
-      }
-
-      if (header) {
-        bodyContainer.style.setProperty(
-          'margin-top',
-          getBannerHeight() + header.offsetHeight + 'px',
-          'important'
-        );
-      }
+      bodyContainer.style.setProperty(
+        'margin-top',
+        getBannerHeight() + header.offsetHeight + 'px',
+        'important'
+      );
     }
 
     function bindLayoutSync() {
@@ -388,23 +391,25 @@ document.addEventListener('DOMContentLoaded', function() {
         '}',
         '@media (max-width: 991px) {',
         '  .sc-rbn-live-banner-v2 { --sc-rbn-banner-height: 38px; }',
-        '  body.sc-rbn-live-banner-v2-active {',
-        '    padding-top: var(--sc-rbn-banner-height);',
-        '  }',
         '  body.sc-rbn-live-banner-v2-active .sc-rbn-live-banner-v2 {',
         '    position: fixed;',
         '    top: 0;',
         '    left: 0;',
         '    right: 0;',
-        '    z-index: 25;',
+        '    z-index: 30;',
         '  }',
         '  body.sc-rbn-live-banner-v2-active header {',
-        '    position: static !important;',
-        '    top: auto !important;',
-        '    padding-top: 0 !important;',
+        '    top: var(--sc-rbn-banner-height) !important;',
         '  }',
-        '  body.sc-rbn-live-banner-v2-active #body-container {',
-        '    margin-top: 0 !important;',
+        '  body.sc-rbn-live-banner-v2-active.scrollup header {',
+        '    top: var(--sc-rbn-banner-height) !important;',
+        '  }',
+        '  body.sc-rbn-live-banner-v2-active.has-slot-alert.scrollup header,',
+        '  body.sc-rbn-live-banner-v2-active.scrolled.has-slot-alert header {',
+        '    top: calc(var(--sc-rbn-banner-height) + 27px) !important;',
+        '  }',
+        '  body.sc-rbn-live-banner-v2-active.scroll header {',
+        '    top: calc(var(--sc-rbn-banner-height) - 60px) !important;',
         '  }',
         '}',
         '@media (max-width: 575px) {',
