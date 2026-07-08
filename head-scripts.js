@@ -197,14 +197,39 @@ document.addEventListener('DOMContentLoaded', function() {
       return isMobileLayout() ? 38 : 42;
     }
 
-    function syncBodyOffset() {
+    function getBodyContainerMargin() {
+      var bannerHeight = getBannerHeight();
       var header = document.querySelector('header');
+      if (!header) {
+        return bannerHeight;
+      }
+
+      if (isMobileLayout()) {
+        if (
+          document.body.classList.contains('scrolled') &&
+          document.body.classList.contains('has-slot-alert')
+        ) {
+          return bannerHeight + 136;
+        }
+
+        if (
+          document.body.classList.contains('has-slot-alert') &&
+          document.body.classList.contains('scrollup')
+        ) {
+          return bannerHeight + 87;
+        }
+      }
+
+      return bannerHeight + header.offsetHeight;
+    }
+
+    function syncBodyOffset() {
       var bodyContainer = document.getElementById('body-container');
-      if (!header || !bodyContainer) return;
+      if (!bodyContainer) return;
 
       bodyContainer.style.setProperty(
         'margin-top',
-        getBannerHeight() + header.offsetHeight + 'px',
+        getBodyContainerMargin() + 'px',
         'important'
       );
     }
@@ -410,6 +435,19 @@ document.addEventListener('DOMContentLoaded', function() {
         '  }',
         '  body.sc-rbn-live-banner-v2-active.scroll header {',
         '    top: calc(var(--sc-rbn-banner-height) - 60px) !important;',
+        '  }',
+        '  body.sc-rbn-live-banner-v2-active .slot-leaderboard .slot-fixed {',
+        '    top: var(--sc-rbn-banner-height) !important;',
+        '  }',
+        '  body.sc-rbn-live-banner-v2-active.scrollup .slot-leaderboard .slot-fixed {',
+        '    top: calc(var(--sc-rbn-banner-height) + 60px) !important;',
+        '  }',
+        '  body.sc-rbn-live-banner-v2-active.has-slot-alert .slot-leaderboard .slot-fixed {',
+        '    top: calc(var(--sc-rbn-banner-height) + 28px) !important;',
+        '  }',
+        '  body.sc-rbn-live-banner-v2-active.has-slot-alert.scrollup .slot-leaderboard .slot-fixed,',
+        '  body.sc-rbn-live-banner-v2-active.scrolled.has-slot-alert .slot-leaderboard .slot-fixed {',
+        '    top: calc(var(--sc-rbn-banner-height) + 87px) !important;',
         '  }',
         '}',
         '@media (max-width: 575px) {',
