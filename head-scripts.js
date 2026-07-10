@@ -170,4 +170,340 @@ document.addEventListener('DOMContentLoaded', function() {
       target.insertBefore(wrapper.firstChild, target.firstChild);
     }
   })();
+
+  (function() {
+      function isRbnLiveWindow() {
+        // Production window: July 12, 2026 5:00 PM ET – July 13, 2026 12:00 AM ET
+        var start = Date.parse('2026-07-12T17:00:00-04:00');
+        var end = Date.parse('2026-07-13T00:00:00-04:00');
+        return Date.now() >= start && Date.now() < end;
+      }
+
+      function isMobileLayout() {
+        return window.matchMedia('(max-width: 991px)').matches;
+      }
+
+      function getBannerHeight() {
+        return isMobileLayout() ? 38 : 42;
+      }
+
+      function getBodyContainerMargin() {
+        var bannerHeight = getBannerHeight();
+        var header = document.querySelector('header');
+        if (!header) {
+          return bannerHeight;
+        }
+
+        if (isMobileLayout()) {
+          if (
+            document.body.classList.contains('scrolled') &&
+            document.body.classList.contains('has-slot-alert')
+          ) {
+            return bannerHeight + 136;
+          }
+
+          if (
+            document.body.classList.contains('has-slot-alert') &&
+            document.body.classList.contains('scrollup')
+          ) {
+            return bannerHeight + 87;
+          }
+        }
+
+        return bannerHeight + header.offsetHeight;
+      }
+
+      function syncBodyOffset() {
+        var bodyContainer = document.getElementById('body-container');
+        if (!bodyContainer) return;
+
+        bodyContainer.style.setProperty(
+          'margin-top',
+          getBodyContainerMargin() + 'px',
+          'important'
+        );
+      }
+
+      function bindLayoutSync() {
+        var resizeTimer;
+        window.addEventListener('resize', function () {
+          clearTimeout(resizeTimer);
+          resizeTimer = setTimeout(function () {
+            var banner = document.getElementById('sc-rbn-live-banner-v2');
+            var height = getBannerHeight();
+            if (banner) {
+              banner.style.setProperty('--sc-rbn-banner-height', height + 'px');
+            }
+            document.documentElement.style.setProperty('--sc-rbn-banner-height', height + 'px');
+            syncBodyOffset();
+          }, 100);
+        });
+
+        if (window.MutationObserver) {
+          var observer = new MutationObserver(syncBodyOffset);
+          observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+
+          var header = document.querySelector('header');
+          if (header) {
+            observer.observe(header, { childList: true, subtree: true, attributes: true });
+          }
+        }
+      }
+
+      function buildTickerSegmentHtml() {
+        var footballIcon =
+          '<span class="sc-rbn-live-banner-v2__football" aria-hidden="true">' +
+          '<i class="fa-solid fa-football"></i>' +
+          '</span>';
+
+        return (
+          '<span class="sc-rbn-live-banner-v2__segment">' +
+          'Riders vs Tiger-Cats' +
+          footballIcon +
+          'Click to watch the Rider Broadcast Network live now' +
+          '</span>'
+        );
+      }
+
+      function injectRbnLiveBannerV2() {
+        if (!isRbnLiveWindow()) return;
+
+        if (!document.body || document.getElementById('sc-rbn-live-banner-v2')) return;
+
+        var bannerHeight = getBannerHeight();
+        var tickerSegment = buildTickerSegmentHtml();
+        var ariaLabel = 'Riders vs Tiger-Cats - Click to watch the Rider Broadcast Network live now. Opens live stream in a new tab.';
+
+        var style = document.createElement('style');
+        style.type = 'text/css';
+        style.textContent = [
+          '.sc-rbn-live-banner-v2 {',
+          '  --sc-green: #016a1b;',
+          '  --sc-green-dark: #014814;',
+          '  --sc-rbn-banner-height: 42px;',
+          '  display: block;',
+          '  width: 100%;',
+          '  height: var(--sc-rbn-banner-height);',
+          '  background: var(--sc-green);',
+          '  border-bottom: 1px solid var(--sc-green-dark);',
+          '  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);',
+          '}',
+          '.sc-rbn-live-banner-v2:hover { background: var(--sc-green-dark); }',
+          '.sc-rbn-live-banner-v2__container {',
+          '  max-width: 990px;',
+          '  height: 100%;',
+          '  margin: 0 auto;',
+          '  padding: 0 15px;',
+          '}',
+          '.sc-rbn-live-banner-v2__link {',
+          '  display: flex;',
+          '  align-items: center;',
+          '  height: 100%;',
+          '  text-decoration: none !important;',
+          '  color: #fff;',
+          '}',
+          '.sc-rbn-live-banner-v2__link:hover,',
+          '.sc-rbn-live-banner-v2__link:focus {',
+          '  text-decoration: none !important;',
+          '  color: #fff;',
+          '}',
+          '.sc-rbn-live-banner-v2__inner {',
+          '  display: flex;',
+          '  align-items: center;',
+          '  gap: 12px;',
+          '  width: 100%;',
+          '  min-width: 0;',
+          '}',
+          '.sc-rbn-live-banner-v2__icon {',
+          '  flex: 0 0 auto;',
+          '  display: block;',
+          '  width: 28px;',
+          '  height: 28px;',
+          '}',
+          '.sc-rbn-live-banner-v2__icon svg {',
+          '  display: block;',
+          '  width: 28px;',
+          '  height: 28px;',
+          '}',
+          '.sc-rbn-live-banner-v2__signal {',
+          '  transform-box: fill-box;',
+          '  transform-origin: center;',
+          '}',
+          '.sc-rbn-live-banner-v2__signal--inner {',
+          '  fill: rgba(255, 255, 255, 0.45);',
+          '  animation: sc-rbn-v2-signal-inner 2s ease-in-out infinite;',
+          '}',
+          '.sc-rbn-live-banner-v2__signal--outer {',
+          '  fill: rgba(255, 255, 255, 0.75);',
+          '  animation: sc-rbn-v2-signal-outer 2s ease-in-out infinite;',
+          '}',
+          '.sc-rbn-live-banner-v2__tower { fill: #fff; }',
+          '.sc-rbn-live-banner-v2__ticker {',
+          '  flex: 1 1 auto;',
+          '  min-width: 0;',
+          '  overflow: hidden;',
+          '  height: 100%;',
+          '  display: flex;',
+          '  align-items: center;',
+          '}',
+          '.sc-rbn-live-banner-v2__track {',
+          '  display: flex;',
+          '  width: max-content;',
+          '  animation: sc-rbn-v2-ticker 18s linear infinite;',
+          '}',
+          '.sc-rbn-live-banner-v2__segment {',
+          '  flex: 0 0 auto;',
+          '  display: inline-flex;',
+          '  align-items: center;',
+          '  gap: 0.65rem;',
+          '  padding-right: 3rem;',
+          '  font-family: "beachwood-variable", sans-serif;',
+          '  font-size: 13px;',
+          '  font-weight: 600;',
+          '  letter-spacing: 0.08em;',
+          '  line-height: 1;',
+          '  text-transform: uppercase;',
+          '  white-space: nowrap;',
+          '  color: #fff;',
+          '}',
+          '.sc-rbn-live-banner-v2__football {',
+          '  display: inline-flex;',
+          '  align-items: center;',
+          '  justify-content: center;',
+          '  flex: 0 0 auto;',
+          '  color: rgba(255, 255, 255, 0.92);',
+          '}',
+          '.sc-rbn-live-banner-v2__football i {',
+          '  font-size: 14px;',
+          '  line-height: 1;',
+          '}',
+          '@keyframes sc-rbn-v2-signal-inner {',
+          '  0%, 100% { opacity: 0.35; transform: scale(0.92); }',
+          '  20% { opacity: 1; transform: scale(1); }',
+          '  45% { opacity: 0.35; transform: scale(1); }',
+          '}',
+          '@keyframes sc-rbn-v2-signal-outer {',
+          '  0%, 100% { opacity: 0.4; transform: scale(0.88); }',
+          '  20% { opacity: 0.4; transform: scale(0.88); }',
+          '  45% { opacity: 1; transform: scale(1); }',
+          '  70% { opacity: 0.4; transform: scale(1.04); }',
+          '}',
+          '@keyframes sc-rbn-v2-ticker {',
+          '  0% { transform: translateX(0); }',
+          '  100% { transform: translateX(-33.333%); }',
+          '}',
+          '@media (min-width: 992px) {',
+          '  body.sc-rbn-live-banner-v2-active .sc-rbn-live-banner-v2 {',
+          '    position: fixed;',
+          '    top: 0;',
+          '    left: 0;',
+          '    right: 0;',
+          '    z-index: 30;',
+          '  }',
+          '  body.sc-rbn-live-banner-v2-active header {',
+          '    top: var(--sc-rbn-banner-height) !important;',
+          '  }',
+          '}',
+          '@media (max-width: 991px) {',
+          '  .sc-rbn-live-banner-v2 { --sc-rbn-banner-height: 38px; }',
+          '  body.sc-rbn-live-banner-v2-active .sc-rbn-live-banner-v2 {',
+          '    position: fixed;',
+          '    top: 0;',
+          '    left: 0;',
+          '    right: 0;',
+          '    z-index: 30;',
+          '  }',
+          '  body.sc-rbn-live-banner-v2-active header {',
+          '    top: var(--sc-rbn-banner-height) !important;',
+          '  }',
+          '  body.sc-rbn-live-banner-v2-active.scrollup header {',
+          '    top: var(--sc-rbn-banner-height) !important;',
+          '  }',
+          '  body.sc-rbn-live-banner-v2-active.has-slot-alert.scrollup header,',
+          '  body.sc-rbn-live-banner-v2-active.scrolled.has-slot-alert header {',
+          '    top: calc(var(--sc-rbn-banner-height) + 27px) !important;',
+          '  }',
+          '  body.sc-rbn-live-banner-v2-active.scroll header {',
+          '    top: calc(var(--sc-rbn-banner-height) - 60px) !important;',
+          '  }',
+          '  body.sc-rbn-live-banner-v2-active .slot-leaderboard .slot-fixed {',
+          '    top: var(--sc-rbn-banner-height) !important;',
+          '  }',
+          '  body.sc-rbn-live-banner-v2-active.scrollup .slot-leaderboard .slot-fixed {',
+          '    top: calc(var(--sc-rbn-banner-height) + 60px) !important;',
+          '  }',
+          '  body.sc-rbn-live-banner-v2-active.has-slot-alert .slot-leaderboard .slot-fixed {',
+          '    top: calc(var(--sc-rbn-banner-height) + 28px) !important;',
+          '  }',
+          '  body.sc-rbn-live-banner-v2-active.has-slot-alert.scrollup .slot-leaderboard .slot-fixed,',
+          '  body.sc-rbn-live-banner-v2-active.scrolled.has-slot-alert .slot-leaderboard .slot-fixed {',
+          '    top: calc(var(--sc-rbn-banner-height) + 87px) !important;',
+          '  }',
+          '}',
+          '@media (max-width: 575px) {',
+          '  .sc-rbn-live-banner-v2__container { max-width: none; padding: 0 10px; }',
+          '  .sc-rbn-live-banner-v2__inner { gap: 8px; }',
+          '  .sc-rbn-live-banner-v2__icon,',
+          '  .sc-rbn-live-banner-v2__icon svg { width: 24px; height: 24px; }',
+          '  .sc-rbn-live-banner-v2__segment { font-size: 11px; letter-spacing: 0.05em; padding-right: 2rem; gap: 0.5rem; }',
+          '  .sc-rbn-live-banner-v2__football i { font-size: 12px; }',
+          '  .sc-rbn-live-banner-v2__track { animation-duration: 14s; }',
+          '}',
+          '@media (prefers-reduced-motion: reduce) {',
+          '  .sc-rbn-live-banner-v2__signal { animation: none; }',
+          '  .sc-rbn-live-banner-v2__signal--inner { opacity: 0.7; transform: none; }',
+          '  .sc-rbn-live-banner-v2__signal--outer { opacity: 0.9; transform: none; }',
+          '  .sc-rbn-live-banner-v2__track { animation: none; transform: none; }',
+          '}'
+        ].join('\n');
+
+        document.head.appendChild(style);
+
+        var banner = document.createElement('div');
+        banner.id = 'sc-rbn-live-banner-v2';
+        banner.className = 'sc-rbn-live-banner-v2';
+        banner.style.setProperty('--sc-rbn-banner-height', bannerHeight + 'px');
+        document.documentElement.style.setProperty('--sc-rbn-banner-height', bannerHeight + 'px');
+        banner.innerHTML = [
+          '<div class="sc-rbn-live-banner-v2__container">',
+          '  <a class="sc-rbn-live-banner-v2__link" href="https://www.youtube.com/live/p_506H_E6aI?si=S5-scDclZK96NZ7V" target="_blank" rel="noopener noreferrer" aria-label="' + ariaLabel + '">',
+          '    <div class="sc-rbn-live-banner-v2__inner">',
+          '      <span class="sc-rbn-live-banner-v2__icon" aria-hidden="true">',
+          '        <svg viewBox="0 0 193.5 177.1" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">',
+          '          <path class="sc-rbn-live-banner-v2__signal sc-rbn-live-banner-v2__signal--outer" d="M55.3,156.1c-25.3-14.5-42.3-41.7-42.3-72.9S29.3,26,53.7,11.3L47.2,0C18.9,17,0,47.9,0,83.2s19.7,67.6,49,84.3l6.3-11.4Z"/>',
+          '          <path class="sc-rbn-live-banner-v2__signal sc-rbn-live-banner-v2__signal--outer" d="M138.2,156.1c25.3-14.5,42.3-41.7,42.3-72.9,0-30.5-16.3-57.2-40.7-71.9l6.5-11.3c28.3,17,47.2,47.9,47.2,83.2,0,36.1-19.7,67.6-49,84.3l-6.3-11.4Z"/>',
+          '          <path class="sc-rbn-live-banner-v2__signal sc-rbn-live-banner-v2__signal--inner" d="M72.1,127.2c-15.1-8.6-25.3-24.8-25.3-43.4s9.8-34.1,24.3-42.8l-6.4-11.4c-18.5,11-30.9,31.1-30.9,54.2s12.9,44,32,54.8l6.3-11.4Z"/>',
+          '          <path class="sc-rbn-live-banner-v2__signal sc-rbn-live-banner-v2__signal--inner" d="M121.4,127.2c15.1-8.6,25.3-24.8,25.3-43.4,0-18.2-9.8-34.1-24.3-42.8l6.4-11.4c18.5,11,30.9,31.1,30.9,54.2s-12.9,44-32,54.8l-6.3-11.4Z"/>',
+          '          <path class="sc-rbn-live-banner-v2__tower" d="M119.3,82.9c0-12.5-10.1-22.6-22.6-22.6s-22.6,10.1-22.6,22.6,6,17.8,14.4,21.1l-12.4,63.3c0,5.4,4.4,9.8,9.8,9.8h21.7c5.4,0,9.8-4.4,9.8-9.8l-12.7-63.2c8.6-3.2,14.7-11.5,14.7-21.2Z"/>',
+          '        </svg>',
+          '      </span>',
+          '      <div class="sc-rbn-live-banner-v2__ticker" aria-hidden="true">',
+          '        <div class="sc-rbn-live-banner-v2__track">',
+          '          ' + tickerSegment,
+          '          ' + tickerSegment,
+          '          ' + tickerSegment,
+          '        </div>',
+          '      </div>',
+          '    </div>',
+          '  </a>',
+          '</div>'
+        ].join('');
+
+        var header = document.querySelector('header');
+        if (header && header.parentNode) {
+          header.parentNode.insertBefore(banner, header);
+        } else {
+          document.body.insertBefore(banner, document.body.firstChild);
+        }
+
+        document.body.classList.add('sc-rbn-live-banner-v2-active');
+        syncBodyOffset();
+        bindLayoutSync();
+
+        window.setTimeout(syncBodyOffset, 250);
+        window.setTimeout(syncBodyOffset, 1000);
+      }
+
+    injectRbnLiveBannerV2();
+  })();
 });
