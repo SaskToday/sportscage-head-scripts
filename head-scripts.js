@@ -260,7 +260,7 @@ document.addEventListener('DOMContentLoaded', function() {
           '<span class="sc-rbn-live-banner-v2__segment">' +
           'Riders vs Tiger-Cats' +
           footballIcon +
-          'WIN A VIP SUITE EXPERIENCE AT THE RIDER GAME AUGUST 7 | WATCH RIDER BROADCAST NETWORK NOW' +
+          'Click to watch the Rider Broadcast Network live now' +
           '</span>'
         );
       }
@@ -272,7 +272,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         var bannerHeight = getBannerHeight();
         var tickerSegment = buildTickerSegmentHtml();
-        var ariaLabel = 'Riders vs Tiger-Cats - WIN A VIP SUITE EXPERIENCE AT THE RIDER GAME AUGUST 7. Watch Rider Broadcast Network now. Opens live stream in a new tab.';
+        var ariaLabel = 'Riders vs Tiger-Cats - Click to watch the Rider Broadcast Network live now. Opens live stream in a new tab.';
 
         var style = document.createElement('style');
         style.type = 'text/css';
