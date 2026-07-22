@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
     </div>
   </div>
-  <p class="rr-signup-card__legal">By signing up you agree to receive emails from SportsCage, as well as our <a href="https://www.sportscage.com/other/terms-of-service">terms of service</a> and <a href="https://www.sportscage.com/other/privacy-policy">privacy policy</a>. Unsubscribe anytime. 1900 Rose St, Regina SK S4P 0A9.</p>
+  <p class="rr-signup-card__legal">By signing up you agree to receive emails from SportsCage, as well as our <a href="https://www.sportscage.com/other/terms-of-service">terms of service</a> and <a href="https://www.sportscage.com/other/privacy-policy">privacy policy</a>. 1900 Rose St, Regina SK S4P 0A9.</p>
 </div>` : `
 <style type="text/css">
 .sc-signup-card {
@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
     </div>
   </div>
-  <p class="sc-signup-card__legal">By signing up you agree to receive emails from SportsCage, as well as our <a href="https://www.sportscage.com/other/terms-of-service">terms of service</a> and <a href="https://www.sportscage.com/other/privacy-policy">privacy policy</a>. Unsubscribe anytime. 1900 Rose St, Regina SK S4P 0A9.</p>
+  <p class="sc-signup-card__legal">By signing up you agree to receive emails from SportsCage, as well as our <a href="https://www.sportscage.com/other/terms-of-service">terms of service</a> and <a href="https://www.sportscage.com/other/privacy-policy">privacy policy</a>. 1900 Rose St, Regina SK S4P 0A9.</p>
 </div>`;
 
     var wrapper = document.createElement('div');
