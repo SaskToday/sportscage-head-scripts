@@ -13,10 +13,14 @@
   // ---------------------------------------------------------------------------
   var NEWSLETTERS = {
     'regina-today': {
-      title: 'ReginaToday',
-      titleStyle: 'today', // green city + black "Today", no space
-      description:
-        'Discover everything happening in Regina in a 5-minute read. Breaking news, community events, obituaries and more.',
+      layout: 'tagline-lead',
+      accent: '#016a1b',
+      whisker: 'ReginaToday Daily Newsletter',
+      headlineBefore: 'Everything ',
+      headlineAccent: 'Regina',
+      headlineAfter: ' in a five-minute read.',
+      body: "The day's local news in one email, in your inbox every day.",
+      legalBrand: 'ReginaToday',
       formAction:
         'https://sasktoday.us18.list-manage.com/subscribe/post?u=115183fbae903a83f5f107dab&id=b666fb9950&f_id=00cab6e6f0',
       honeypot: 'b_115183fbae903a83f5f107dab_b666fb9950',
@@ -130,11 +134,26 @@
     { prefixes: ['/crime-cops-court'], key: 'crime-cops-court' }
   ];
 
-  var LEGAL_HTML =
-    'By signing up you agree to receive emails from SaskToday, as well as our ' +
-    '<a href="https://www.sasktoday.ca/other/terms-of-service">terms of service</a> and ' +
-    '<a href="https://www.sasktoday.ca/other/privacy-policy">privacy policy</a>. ' +
-    'Unsubscribe anytime. 1900 Rose St, Regina SK S4P 0A9.';
+  var MAILING_ADDRESS = '1900 Rose St, Regina SK S4P 0A9';
+  var TERMS_URL = 'https://www.sasktoday.ca/other/terms-of-service';
+  var PRIVACY_URL = 'https://www.sasktoday.ca/other/privacy-policy';
+
+  function buildLegalHtml(brand) {
+    return (
+      'By signing up you agree to receive emails from ' +
+      escapeHtml(brand || 'SaskToday') +
+      ', as well as our ' +
+      '<a href="' +
+      TERMS_URL +
+      '">terms of service</a> and ' +
+      '<a href="' +
+      PRIVACY_URL +
+      '">privacy policy</a>. ' +
+      'Unsubscribe anytime. ' +
+      MAILING_ADDRESS +
+      '.'
+    );
+  }
 
   // ---------------------------------------------------------------------------
   // Targeting
@@ -174,14 +193,30 @@
   // ---------------------------------------------------------------------------
   // Render helpers
   // ---------------------------------------------------------------------------
-  function ensureMontserrat() {
+  function ensureFonts(config) {
+    if (config.layout === 'tagline-lead') {
+      if (document.getElementById('st-nl-tagline-fonts')) return;
+      var preconnect = document.createElement('link');
+      preconnect.rel = 'preconnect';
+      preconnect.href = 'https://fonts.googleapis.com';
+      document.head.appendChild(preconnect);
+
+      var link = document.createElement('link');
+      link.id = 'st-nl-tagline-fonts';
+      link.rel = 'stylesheet';
+      link.href =
+        'https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Source+Sans+3:wght@400;600;700&display=swap';
+      document.head.appendChild(link);
+      return;
+    }
+
     if (document.getElementById('st-nl-montserrat')) return;
-    var link = document.createElement('link');
-    link.id = 'st-nl-montserrat';
-    link.rel = 'stylesheet';
-    link.href =
+    var mont = document.createElement('link');
+    mont.id = 'st-nl-montserrat';
+    mont.rel = 'stylesheet';
+    mont.href =
       'https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap';
-    document.head.appendChild(link);
+    document.head.appendChild(mont);
   }
 
   function escapeHtml(str) {
@@ -250,7 +285,152 @@
     return '';
   }
 
-  function buildCardHtml(config) {
+  function renderFormFields(config) {
+    return (
+      renderInterestFields(config) +
+      '            <div class="clear" id="mce-responses">' +
+      '              <div class="response" id="mce-error-response" style="display:none;">&nbsp;</div>' +
+      '              <div class="response" id="mce-success-response" style="display:none;">&nbsp;</div>' +
+      '            </div>' +
+      '            <div aria-hidden="true" style="position:absolute;left:-5000px;">' +
+      '              <input type="text" name="' +
+      escapeHtml(config.honeypot) +
+      '" tabindex="-1" value="" />' +
+      '            </div>' +
+      (config.sourceField
+        ? '            <input type="hidden" name="' +
+          escapeHtml(config.sourceField) +
+          '" value="' +
+          escapeHtml(config.sourceValue || '') +
+          '" />'
+        : '')
+    );
+  }
+
+  function buildTaglineLeadCardHtml(config) {
+    var accent = config.accent || '#016a1b';
+    return (
+      '<style type="text/css">' +
+      '.st-tl-card {' +
+      '  --ink: #141a16;' +
+      '  --ink-soft: #3d443f;' +
+      '  --muted: #555b56;' +
+      '  --placeholder: #6b716c;' +
+      '  --accent: ' +
+      accent +
+      ';' +
+      '  --accent-hover: #014d13;' +
+      '  --danger: #c4412b;' +
+      '  --btn: #111a14;' +
+      '  --serif: "Alfa Slab One", Georgia, serif;' +
+      '  --sans: "Source Sans 3", system-ui, sans-serif;' +
+      '  margin-top: 40px;' +
+      '  box-sizing: border-box;' +
+      '  border: 3px solid var(--ink);' +
+      '  background: #fff;' +
+      '  padding: 44px 44px 40px;' +
+      '  box-shadow: 14px 14px 0 var(--accent);' +
+      '  display: flex;' +
+      '  flex-direction: column;' +
+      '  gap: 20px;' +
+      '  font-family: var(--sans);' +
+      '  color: var(--ink);' +
+      '}' +
+      '@media (max-width: 639px) {' +
+      '  .st-tl-card { padding: 28px 24px 28px; box-shadow: 10px 10px 0 var(--accent); }' +
+      '  .st-tl-card__headline { font-size: 34px !important; }' +
+      '}' +
+      '.st-tl-card__whisker {' +
+      '  font-size: 13px; line-height: 1; font-weight: 700;' +
+      '  letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent);' +
+      '}' +
+      '.st-tl-card__headline {' +
+      '  margin: 0; font-family: var(--serif) !important; font-weight: 400;' +
+      '  font-size: 46px; line-height: 1.06; color: var(--ink);' +
+      '}' +
+      '.st-tl-card__headline-accent { color: var(--accent); }' +
+      '.st-tl-card__body {' +
+      '  margin: 0; font-size: 20px; line-height: 1.45; color: var(--ink-soft);' +
+      '}' +
+      '.st-tl-card a { color: var(--accent); }' +
+      '.st-tl-card a:hover { color: var(--accent-hover); }' +
+      '.st-tl-card .st-mc-host { margin-top: 8px; }' +
+      '.st-tl-card #mc_embed_signup { background: transparent; clear: left; font: inherit; width: 100%; }' +
+      '.st-tl-card #mc_embed_signup form { padding: 0; margin: 0; }' +
+      '.st-tl-card .mc-field-group { width: 100%; padding-bottom: 0; display: flex; flex-direction: column; gap: 10px; }' +
+      '.st-tl-card .mc-field-group label {' +
+      '  font-size: 12px; line-height: 1; font-weight: 700;' +
+      '  letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted);' +
+      '}' +
+      '.st-tl-card .asterisk { color: var(--danger); }' +
+      '.st-tl-card #mce-EMAIL {' +
+      '  width: 100%; box-sizing: border-box; height: 54px;' +
+      '  border: 0; border-bottom: 3px solid var(--ink); border-radius: 0;' +
+      '  padding: 0; background: transparent;' +
+      '  font-family: var(--sans); font-size: 19px; color: var(--ink); outline: none;' +
+      '}' +
+      '.st-tl-card #mce-EMAIL::placeholder { color: var(--placeholder); }' +
+      '.st-tl-card #mce-EMAIL:focus { border-bottom-color: var(--accent); }' +
+      '.st-tl-card .clear { margin-top: 18px; }' +
+      '.st-tl-card #mc-embedded-subscribe {' +
+      '  -webkit-appearance: none; appearance: none;' +
+      '  height: 60px; width: 100%; background: var(--btn); color: #fff;' +
+      '  border: 0; border-radius: 3px;' +
+      '  font-family: var(--sans); font-weight: 700; font-size: 16px;' +
+      '  letter-spacing: 0.22em; text-transform: uppercase; cursor: pointer;' +
+      '  transition: background .2s ease, transform .15s ease;' +
+      '}' +
+      '.st-tl-card #mc-embedded-subscribe:hover { background: var(--accent); }' +
+      '.st-tl-card #mc-embedded-subscribe:active { transform: translateY(1px); }' +
+      '.st-tl-card .response { font-size: 13px; padding: 8px 0; }' +
+      '.st-tl-card #mce-error-response { color: var(--danger); }' +
+      '.st-tl-card #mce-success-response { color: var(--accent-hover); }' +
+      '.st-tl-card__legal {' +
+      '  margin: 4px 0 0; font-size: 14px; line-height: 1.55; color: var(--muted);' +
+      '}' +
+      '</style>' +
+      '<div class="st-tl-card">' +
+      '  <div class="st-tl-card__whisker">' +
+      escapeHtml(config.whisker) +
+      '</div>' +
+      '  <h1 class="st-tl-card__headline">' +
+      escapeHtml(config.headlineBefore || '') +
+      '<span class="st-tl-card__headline-accent">' +
+      escapeHtml(config.headlineAccent || '') +
+      '</span>' +
+      escapeHtml(config.headlineAfter || '') +
+      '</h1>' +
+      '  <p class="st-tl-card__body">' +
+      escapeHtml(config.body || '') +
+      '</p>' +
+      '  <div class="st-mc-host">' +
+      '    <div id="mc_embed_shell">' +
+      '      <div id="mc_embed_signup">' +
+      '        <form action="' +
+      escapeHtml(config.formAction) +
+      '" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>' +
+      '          <div id="mc_embed_signup_scroll">' +
+      '            <div class="mc-field-group">' +
+      '              <label for="mce-EMAIL">Email address <span class="asterisk">*</span></label>' +
+      '              <input type="email" name="EMAIL" class="required email" id="mce-EMAIL" required value="" placeholder="name@email.com" />' +
+      '            </div>' +
+      renderFormFields(config) +
+      '            <div class="clear">' +
+      '              <input type="submit" name="subscribe" id="mc-embedded-subscribe" class="button" value="Sign me up →" />' +
+      '            </div>' +
+      '          </div>' +
+      '        </form>' +
+      '      </div>' +
+      '    </div>' +
+      '  </div>' +
+      '  <p class="st-tl-card__legal">' +
+      buildLegalHtml(config.legalBrand) +
+      '</p>' +
+      '</div>'
+    );
+  }
+
+  function buildLegacyCardHtml(config) {
     return (
       '<style type="text/css">' +
       // Card chrome mirrors SportsCage Riders widget (white bg, ink border, green shadow)
@@ -313,23 +493,7 @@
       '              <label for="mce-EMAIL">Email Address <span class="asterisk">*</span></label>' +
       '              <input type="email" name="EMAIL" class="required email" id="mce-EMAIL" required value="" />' +
       '            </div>' +
-      renderInterestFields(config) +
-      '            <div class="clear" id="mce-responses">' +
-      '              <div class="response" id="mce-error-response" style="display:none;">&nbsp;</div>' +
-      '              <div class="response" id="mce-success-response" style="display:none;">&nbsp;</div>' +
-      '            </div>' +
-      '            <div aria-hidden="true" style="position:absolute;left:-5000px;">' +
-      '              <input type="text" name="' +
-      escapeHtml(config.honeypot) +
-      '" tabindex="-1" value="" />' +
-      '            </div>' +
-      (config.sourceField
-        ? '            <input type="hidden" name="' +
-          escapeHtml(config.sourceField) +
-          '" value="' +
-          escapeHtml(config.sourceValue || '') +
-          '" />'
-        : '') +
+      renderFormFields(config) +
       '            <div class="clear">' +
       '              <input type="submit" name="subscribe" id="mc-embedded-subscribe" class="button" value="Sign me up →" />' +
       '            </div>' +
@@ -339,10 +503,17 @@
       '    </div>' +
       '  </div>' +
       '  <p class="st-signup-card__legal">' +
-      LEGAL_HTML +
+      buildLegalHtml('SaskToday') +
       '</p>' +
       '</div>'
     );
+  }
+
+  function buildCardHtml(config) {
+    if (config.layout === 'tagline-lead') {
+      return buildTaglineLeadCardHtml(config);
+    }
+    return buildLegacyCardHtml(config);
   }
 
   function bindInterestValidation(root, config) {
@@ -382,7 +553,7 @@
       return false;
     }
 
-    ensureMontserrat();
+    ensureFonts(config);
 
     var wrapper = document.createElement('div');
     wrapper.innerHTML = buildCardHtml(config);
