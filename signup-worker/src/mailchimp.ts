@@ -2,7 +2,12 @@ import type { InterestTarget } from './interests';
 import { md5Hex } from './crypto';
 
 export type MailchimpOutcome =
-  | { kind: 'ok'; resubscribed?: boolean }
+  | {
+      kind: 'ok';
+      resubscribed?: boolean;
+      previousStatus?: MemberStatus;
+      activityEventRecorded?: boolean;
+    }
   | { kind: 'member_state'; title: string }
   | { kind: 'invalid_email'; title: string }
   | { kind: 'config_error'; title: string; status: number }
@@ -167,6 +172,69 @@ export async function getMemberStatus(opts: {
 }
 
 /**
+ * Record a custom event on the contact Activity feed.
+ * Failures are logged only — preference updates should still succeed.
+ */
+export async function trackMemberEvent(opts: {
+  apiKey: string;
+  dc: string;
+  audienceId: string;
+  email: string;
+  name: string;
+  properties?: Record<string, string>;
+  timeoutMs?: number;
+}): Promise<boolean> {
+  const hash = await md5Hex(opts.email);
+  const url = `https://${opts.dc}.api.mailchimp.com/3.0/lists/${opts.audienceId}/members/${hash}/events`;
+
+  const controller = new AbortController();
+  const timer = setTimeout(
+    () => controller.abort(),
+    opts.timeoutMs ?? 8000
+  );
+
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        authorization: authHeader(opts.apiKey),
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        name: opts.name,
+        properties: opts.properties || {}
+      }),
+      signal: controller.signal
+    });
+
+    if (res.ok || res.status === 204) {
+      return true;
+    }
+
+    const { title, detail } = await readErrorBody(res);
+    console.log(
+      JSON.stringify({
+        outcome: 'mailchimp_event_error',
+        status: res.status,
+        title,
+        detail: detail.slice(0, 200)
+      })
+    );
+    return false;
+  } catch (e) {
+    console.log(
+      JSON.stringify({
+        outcome: 'mailchimp_event_error',
+        title: e instanceof Error ? e.name : 'network'
+      })
+    );
+    return false;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/**
  * Upsert interests on a member.
  *
  * - New / subscribed / pending: only `status_if_new: pending` (no `status`),
@@ -175,6 +243,7 @@ export async function getMemberStatus(opts: {
  *   double-opt-in email. Interests are stored on the pending member and
  *   remain after they confirm.
  * - Cleaned / compliance: treated as member_state (generic success to client).
+ * - Already subscribed: after interests update, record a custom Activity event.
  */
 export async function upsertMemberInterests(opts: {
   apiKey: string;
@@ -182,6 +251,8 @@ export async function upsertMemberInterests(opts: {
   audienceId: string;
   email: string;
   interests: InterestTarget[];
+  /** Short interest keys from the client, for Activity event properties */
+  interestKeys?: string[];
   timeoutMs?: number;
 }): Promise<MailchimpOutcome> {
   const lookup = await getMemberStatus(opts);
@@ -231,18 +302,44 @@ export async function upsertMemberInterests(opts: {
       signal: controller.signal
     });
 
-    if (res.ok) return { kind: 'ok', resubscribed: resubscribe };
+    if (!res.ok) {
+      const { title, detail } = await readErrorBody(res);
+      console.log(
+        JSON.stringify({
+          outcome: 'mailchimp_error',
+          status: res.status,
+          title,
+          detail: detail.slice(0, 200)
+        })
+      );
+      return classifyError(res.status, title, detail);
+    }
 
-    const { title, detail } = await readErrorBody(res);
-    console.log(
-      JSON.stringify({
-        outcome: 'mailchimp_error',
-        status: res.status,
-        title,
-        detail: detail.slice(0, 200)
-      })
-    );
-    return classifyError(res.status, title, detail);
+    let activityEventRecorded = false;
+    if (lookup.status === 'subscribed') {
+      const labels = opts.interests.map((t) => t.label).join(', ');
+      const keys = (opts.interestKeys || []).join(',');
+      activityEventRecorded = await trackMemberEvent({
+        apiKey: opts.apiKey,
+        dc: opts.dc,
+        audienceId: opts.audienceId,
+        email: opts.email,
+        name: 'newsletter_signup',
+        properties: {
+          action: 'preference_update',
+          newsletters: labels.slice(0, 100),
+          interest_keys: keys.slice(0, 100),
+          source: 'sasktoday-widget'
+        }
+      });
+    }
+
+    return {
+      kind: 'ok',
+      resubscribed: resubscribe,
+      previousStatus: lookup.status,
+      activityEventRecorded
+    };
   } catch (e) {
     const aborted = e instanceof Error && e.name === 'AbortError';
     return {

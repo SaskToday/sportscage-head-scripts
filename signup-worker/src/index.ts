@@ -246,7 +246,8 @@ async function handleSubscribe(
       dc: env.MAILCHIMP_DC,
       audienceId,
       email,
-      interests: targets
+      interests: targets,
+      interestKeys
     });
 
     if (result.kind === 'ok' || result.kind === 'member_state') {
@@ -256,10 +257,14 @@ async function handleSubscribe(
             ? 'member_state'
             : result.resubscribed
               ? 'resubscribe_pending'
-              : 'subscribed',
+              : result.previousStatus === 'subscribed'
+                ? 'preference_update'
+                : 'subscribed',
         emailHash,
         interests: interestKeys,
         audienceId,
+        activityEventRecorded:
+          result.kind === 'ok' ? result.activityEventRecorded : undefined,
         title: result.kind === 'member_state' ? result.title : undefined
       });
       continue;
