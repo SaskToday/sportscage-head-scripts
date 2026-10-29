@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>All newsletter widgets — gallery</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="_preview.css" />
+  <style>
+    .gallery {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 24px 20px 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 48px;
+    }
+    .gallery-item__label {
+      font-family: Montserrat, sans-serif;
+      font-weight: 900;
+      font-size: 13px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(16, 26, 20, 0.45);
+      margin: 0 0 12px;
+    }
+    .gallery .st-signup-card { margin-top: 0; }
+  </style>
+</head>
+<body>
+  <div class="preview-bar">
+    <a href="index.html">← All previews</a>
+    <div>
+      <strong>Gallery</strong>
+      <span>All configured widgets</span>
+    </div>
+    <span class="preview-bar__hint">Design comparison — use individual pages to test submit</span>
+  </div>
+
+  <div class="gallery" id="gallery"></div>
+
+  <script src="../sasktoday-newsletter-inject.js"></script>
+  <script>
+    (function () {
+      var order = [
+        'regina-today',
+        'saskatoon-today',
+        'estevan-today',
+        'sasktoday',
+        'saskag-today',
+        'sportscage',
+        'crime-cops-court'
+      ];
+      var gallery = document.getElementById('gallery');
+      var api = window.SaskTodayNewsletter;
+
+      order.forEach(function (key) {
+        if (!api.NEWSLETTERS[key]) return;
+        var item = document.createElement('section');
+        item.className = 'gallery-item';
+        var label = document.createElement('p');
+        label.className = 'gallery-item__label';
+        label.textContent = key;
+        var host = document.createElement('div');
+        item.appendChild(label);
+        item.appendChild(host);
+        gallery.appendChild(item);
+        api.renderInto(host, key);
+      });
+    })();
+  </script>
+</body>
+</html>
