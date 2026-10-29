@@ -1,0 +1,39 @@
+name = "sasktoday-signup"
+main = "src/index.ts"
+compatibility_date = "2026-10-29"
+compatibility_flags = ["nodejs_compat"]
+
+# Create with: wrangler kv namespace create SIGNUP_STATE
+# Then paste the id below (staging and production can share or use separate namespaces).
+[[kv_namespaces]]
+binding = "SIGNUP_STATE"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"
+preview_id = "REPLACE_WITH_KV_PREVIEW_NAMESPACE_ID"
+
+[vars]
+# Datacenter suffix from the Mailchimp API key (e.g. key-us18 → us18)
+MAILCHIMP_DC = "us18"
+# Comma-separated exact origins allowed to call POST /subscribe
+ALLOWED_ORIGINS = "https://www.sasktoday.ca,https://sasktoday.ca,http://127.0.0.1:8765,http://localhost:8765"
+# Comma-separated hostnames allowed on Turnstile siteverify responses
+TURNSTILE_ALLOWED_HOSTNAMES = "www.sasktoday.ca,sasktoday.ca,127.0.0.1,localhost"
+BODY_MAX_BYTES = "2048"
+EMAIL_MAX_PER_HOUR = "3"
+IP_MAX_PER_HOUR = "10"
+BREAKER_MAX_SIGNUPS_PER_HOUR = "100"
+BREAKER_MAX_MAILCHIMP_ERRORS_PER_5MIN = "20"
+BREAKER_COOLDOWN_SECONDS = "3600"
+TURNSTILE_FAIL_ALERT_PER_10MIN = "200"
+TURNSTILE_FAIL_MAX_PER_IP_10MIN = "5"
+TURNSTILE_FAIL_BLOCK_SECONDS = "600"
+
+[observability]
+enabled = true
+
+[observability.logs]
+enabled = true
+
+# Secrets (set via `wrangler secret put`, never commit):
+#   MAILCHIMP_API_KEY
+#   TURNSTILE_SECRET
+#   ALERT_WEBHOOK_URL
