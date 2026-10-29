@@ -22,7 +22,7 @@ describe('resolveInterestKeys', () => {
     expect(r.ok).toBe(true);
     if (!r.ok) return;
     expect(r.targets[0].audienceId).toBe(SASKTODAY_AUDIENCE_ID);
-    expect(r.targets[0].interestId).toBe('8');
+    expect(r.targets[0].interestId).toBe('529636a6ae');
   });
 
   it('groups SaskToday daily+weekly on one audience', () => {

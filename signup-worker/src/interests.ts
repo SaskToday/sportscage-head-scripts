@@ -24,7 +24,8 @@ export const SPORTSCAGE_AUDIENCE_ID = 'e0e70bc1df';
 export const INTERESTS: Record<string, InterestTarget> = {
   'reginatoday-daily': {
     audienceId: SASKTODAY_AUDIENCE_ID,
-    interestId: '8',
+    // Marketing API interest id (not the embed group[…][…] bit)
+    interestId: '529636a6ae',
     label: 'ReginaToday Daily'
   },
   'saskatoontoday-daily': {
