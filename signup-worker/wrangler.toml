@@ -7,8 +7,8 @@ compatibility_flags = ["nodejs_compat"]
 # Then paste the id below (staging and production can share or use separate namespaces).
 [[kv_namespaces]]
 binding = "SIGNUP_STATE"
-id = "REPLACE_WITH_KV_NAMESPACE_ID"
-preview_id = "REPLACE_WITH_KV_PREVIEW_NAMESPACE_ID"
+id = "e6526283548240a9ae0a7fa50b952f09"
+preview_id = "faf92aef68f14d24ad4aa9af93f954fe"
 
 [vars]
 # Datacenter suffix from the Mailchimp API key (e.g. key-us18 → us18)
