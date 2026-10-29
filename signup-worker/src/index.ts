@@ -94,7 +94,8 @@ async function handleSubscribe(
   }
 
   // Honeypot — fake success, no further work
-  if (typeof body.website === 'string' && body.website.length > 0) {
+  // Note: browsers often autofill name="website"; prefer hp_field on the client.
+  if (honeypotFilled(body)) {
     log({ outcome: 'honeypot', ipHash: await sha256Hex(ip) });
     return jsonResponse({ ok: true, message: SUCCESS_MESSAGE }, 200, origin);
   }

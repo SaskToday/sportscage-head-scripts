@@ -35,30 +35,36 @@ function classifyError(
   const t = title || '';
   const d = (detail || '').toLowerCase();
 
+  // Config mistakes must never look like success (check before member_state —
+  // Mailchimp often uses title "Invalid Resource" for bad interest IDs too).
   if (
-    MEMBER_STATE_TITLES.has(t) ||
+    d.includes('invalid interest') ||
+    d.includes('interest id') ||
+    d.includes('interest category')
+  ) {
+    return { kind: 'config_error', title: t || 'invalid_interest', status };
+  }
+
+  if (
     d.includes('compliance') ||
     d.includes('cleaned') ||
     d.includes('forgotten') ||
-    d.includes('permanently deleted')
+    d.includes('permanently deleted') ||
+    t === 'Member In Compliance State' ||
+    t === 'Forgotten Email Not Subscribed'
   ) {
     return { kind: 'member_state', title: t || 'member_state' };
   }
 
   if (
     status === 400 &&
-    (t === 'Invalid Resource' ||
-      d.includes('looks fake') ||
+    (d.includes('looks fake') ||
       d.includes('invalid email') ||
-      d.includes('valid email'))
+      d.includes('valid email') ||
+      (t === 'Invalid Resource' &&
+        (d.includes('email') || d.includes('fake') || d.includes('domain'))))
   ) {
-    if (
-      d.includes('email') ||
-      d.includes('fake') ||
-      d.includes('domain')
-    ) {
-      return { kind: 'invalid_email', title: t || 'invalid_email' };
-    }
+    return { kind: 'invalid_email', title: t || 'invalid_email' };
   }
 
   if (status === 401 || status === 403 || status === 404) {
