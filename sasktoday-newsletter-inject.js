@@ -467,8 +467,8 @@
         return;
       }
 
-      var honeypot = form.querySelector('input[name="website"]');
-      var website = honeypot ? String(honeypot.value || '') : '';
+      var honeypot = form.querySelector('input[name="hp_field"]');
+      var hpField = honeypot ? String(honeypot.value || '') : '';
 
       var turnstileToken = '';
       if (SIGNUP.turnstileSiteKey && window.turnstile && turnstileWidgetId != null) {
@@ -486,7 +486,7 @@
         email: email,
         interests: interests,
         turnstileToken: turnstileToken,
-        website: website
+        hp_field: hpField
       };
       if (interests.length === 1) payload.interest = interests[0];
 
@@ -504,6 +504,9 @@
         .then(function (_ref) {
           var res = _ref.res;
           var data = _ref.data;
+          if (typeof console !== 'undefined' && console.log) {
+            console.log('[SaskToday signup]', res.status, data);
+          }
           if (res.ok && data.ok) {
             setStatus(statusEl, data.message || SUCCESS_FALLBACK, 'ok');
             form.reset();
