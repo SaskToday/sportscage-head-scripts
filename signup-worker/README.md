@@ -83,6 +83,12 @@ npm test
 npm run typecheck
 ```
 
+## Widget versioning
+
+The inject script defines `WIDGET_VERSION` and sends it on every `/subscribe` call. The Worker attaches `widget_version` to the Mailchimp Activity event `newsletter_signup`.
+
+Keep a human history in repo-root [`WIDGET_CHANGELOG.md`](../WIDGET_CHANGELOG.md). Bump the constant whenever you ship meaningful widget changes; optionally `git tag widget-vX.Y.Z`.
+
 ## Interest keys
 
 | Key | Audience | Notes |

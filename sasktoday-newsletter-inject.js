@@ -8,6 +8,9 @@
  * Preview override: data-newsletter on the container, or ?st_newsletter=<key>
  */
 (function () {
+  // Bump when shipping widget changes; add a note in WIDGET_CHANGELOG.md
+  var WIDGET_VERSION = '1.0.0';
+
   // ---------------------------------------------------------------------------
   // DEPLOY CONFIG — set after Worker + Turnstile are live
   // ---------------------------------------------------------------------------
@@ -486,7 +489,8 @@
         email: email,
         interests: interests,
         turnstileToken: turnstileToken,
-        hp_field: hpField
+        hp_field: hpField,
+        widgetVersion: WIDGET_VERSION
       };
       if (interests.length === 1) payload.interest = interests[0];
 
@@ -601,6 +605,7 @@
     NEWSLETTERS: NEWSLETTERS,
     PATH_RULES: PATH_RULES,
     SIGNUP: SIGNUP,
+    WIDGET_VERSION: WIDGET_VERSION,
     resolveNewsletterKey: resolveNewsletterKey,
     renderInto: renderInto,
     inject: inject

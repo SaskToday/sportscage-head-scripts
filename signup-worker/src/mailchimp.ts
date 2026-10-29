@@ -243,7 +243,8 @@ export async function trackMemberEvent(opts: {
  *   double-opt-in email. Interests are stored on the pending member and
  *   remain after they confirm.
  * - Cleaned / compliance: treated as member_state (generic success to client).
- * - Already subscribed: after interests update, record a custom Activity event.
+ * - After a successful upsert, record a custom Activity event (new + existing)
+ *   including widget_version when provided.
  */
 export async function upsertMemberInterests(opts: {
   apiKey: string;
@@ -253,6 +254,8 @@ export async function upsertMemberInterests(opts: {
   interests: InterestTarget[];
   /** Short interest keys from the client, for Activity event properties */
   interestKeys?: string[];
+  /** Front-end widget build version from WIDGET_CHANGELOG.md */
+  widgetVersion?: string;
   timeoutMs?: number;
 }): Promise<MailchimpOutcome> {
   const lookup = await getMemberStatus(opts);
@@ -315,24 +318,31 @@ export async function upsertMemberInterests(opts: {
       return classifyError(res.status, title, detail);
     }
 
-    let activityEventRecorded = false;
-    if (lookup.status === 'subscribed') {
-      const labels = opts.interests.map((t) => t.label).join(', ');
-      const keys = (opts.interestKeys || []).join(',');
-      activityEventRecorded = await trackMemberEvent({
-        apiKey: opts.apiKey,
-        dc: opts.dc,
-        audienceId: opts.audienceId,
-        email: opts.email,
-        name: 'newsletter_signup',
-        properties: {
-          action: 'preference_update',
-          newsletters: labels.slice(0, 100),
-          interest_keys: keys.slice(0, 100),
-          source: 'sasktoday-widget'
-        }
-      });
-    }
+    const labels = opts.interests.map((t) => t.label).join(', ');
+    const keys = (opts.interestKeys || []).join(',');
+    const action =
+      lookup.status === 'subscribed'
+        ? 'preference_update'
+        : lookup.status === 'unsubscribed'
+          ? 'resubscribe'
+          : lookup.status === 'pending'
+            ? 'pending_update'
+            : 'new_subscriber';
+
+    const activityEventRecorded = await trackMemberEvent({
+      apiKey: opts.apiKey,
+      dc: opts.dc,
+      audienceId: opts.audienceId,
+      email: opts.email,
+      name: 'newsletter_signup',
+      properties: {
+        action,
+        newsletters: labels.slice(0, 100),
+        interest_keys: keys.slice(0, 100),
+        widget_version: (opts.widgetVersion || 'unknown').slice(0, 40),
+        source: 'sasktoday-widget'
+      }
+    });
 
     return {
       kind: 'ok',

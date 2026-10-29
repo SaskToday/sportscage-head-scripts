@@ -21,10 +21,19 @@ type SubscribeBody = {
   interest?: unknown;
   interests?: unknown;
   turnstileToken?: unknown;
+  widgetVersion?: unknown;
   /** @deprecated Prefer hp_field — "website" is often autofilled by browsers */
   website?: unknown;
   hp_field?: unknown;
 };
+
+/** Keep versions short and log-safe for Mailchimp event properties. */
+function parseWidgetVersion(raw: unknown): string {
+  if (typeof raw !== 'string') return 'unknown';
+  const v = raw.trim().slice(0, 40);
+  if (!/^[a-zA-Z0-9._+-]+$/.test(v)) return 'unknown';
+  return v || 'unknown';
+}
 
 function honeypotFilled(body: SubscribeBody): boolean {
   const a = typeof body.hp_field === 'string' ? body.hp_field : '';
@@ -111,6 +120,7 @@ async function handleSubscribe(
   }
 
   const interestKeys = parseInterestKeys(body);
+  const widgetVersion = parseWidgetVersion(body.widgetVersion);
   const resolved = resolveInterestKeys(interestKeys);
   if (!resolved.ok) {
     return jsonResponse(
@@ -247,7 +257,8 @@ async function handleSubscribe(
       audienceId,
       email,
       interests: targets,
-      interestKeys
+      interestKeys,
+      widgetVersion
     });
 
     if (result.kind === 'ok' || result.kind === 'member_state') {
@@ -263,6 +274,7 @@ async function handleSubscribe(
         emailHash,
         interests: interestKeys,
         audienceId,
+        widgetVersion,
         activityEventRecorded:
           result.kind === 'ok' ? result.activityEventRecorded : undefined,
         title: result.kind === 'member_state' ? result.title : undefined
