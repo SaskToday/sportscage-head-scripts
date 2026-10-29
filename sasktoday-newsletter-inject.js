@@ -371,8 +371,10 @@
       emailId +
       '" required value="" placeholder="name@email.com" autocomplete="email" />' +
       '    </div>' +
+      // Honeypot: avoid name="website" — browsers/password managers often autofill it,
+      // which falsely trips the Worker honeypot and skips Mailchimp entirely.
       '    <div class="st-nl-hp" aria-hidden="true">' +
-      '      <label>Website <input type="text" name="website" tabindex="-1" autocomplete="off" value="" /></label>' +
+      '      <label>Company URL<input type="text" name="hp_field" tabindex="-1" autocomplete="off" value="" /></label>' +
       '    </div>' +
       '    <div class="st-nl-turnstile" id="' +
       turnstileId +

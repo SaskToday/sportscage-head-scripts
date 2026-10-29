@@ -21,8 +21,16 @@ type SubscribeBody = {
   interest?: unknown;
   interests?: unknown;
   turnstileToken?: unknown;
+  /** @deprecated Prefer hp_field — "website" is often autofilled by browsers */
   website?: unknown;
+  hp_field?: unknown;
 };
+
+function honeypotFilled(body: SubscribeBody): boolean {
+  const a = typeof body.hp_field === 'string' ? body.hp_field : '';
+  const b = typeof body.website === 'string' ? body.website : '';
+  return a.length > 0 || b.length > 0;
+}
 
 function clientIp(request: Request): string {
   return request.headers.get('CF-Connecting-IP') || '0.0.0.0';
