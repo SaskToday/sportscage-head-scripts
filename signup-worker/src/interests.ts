@@ -1,11 +1,8 @@
 /**
  * Client sends short interest keys only. Never accept raw Mailchimp group IDs.
  *
- * Interest IDs below come from the Mailchimp embed form field names
- * (`group[categoryId][interestId]`). Confirm against the Marketing API before
- * production:
- *   GET /3.0/lists/{audience_id}/interest-categories
- *   GET /3.0/lists/{audience_id}/interest-categories/{id}/interests
+ * Interest IDs are Marketing API interest `id` values (not embed
+ * `group[category][bit]` values). Confirmed 2026-10-29 from list API.
  */
 
 export type InterestTarget = {
@@ -24,46 +21,45 @@ export const SPORTSCAGE_AUDIENCE_ID = 'e0e70bc1df';
 export const INTERESTS: Record<string, InterestTarget> = {
   'reginatoday-daily': {
     audienceId: SASKTODAY_AUDIENCE_ID,
-    // Marketing API interest id (not the embed group[…][…] bit)
     interestId: '529636a6ae',
     label: 'ReginaToday Daily'
   },
   'saskatoontoday-daily': {
     audienceId: SASKTODAY_AUDIENCE_ID,
-    interestId: '32',
+    interestId: '8d20fcd7c5',
     label: 'SaskatoonToday Daily'
   },
   'estevantoday-daily': {
     audienceId: SASKTODAY_AUDIENCE_ID,
-    interestId: '1',
+    interestId: 'e83801031f',
     label: 'EstevanToday Daily'
   },
-  // Yorkton reserved until embed / group exists
+  // Yorkton reserved until group exists
   // 'yorktontoday-daily': { ... },
 
   'sasktoday-daily': {
     audienceId: SASKTODAY_AUDIENCE_ID,
-    interestId: '2',
+    interestId: '1f6feffe71',
     label: 'SaskToday Daily'
   },
   'sasktoday-weekly': {
     audienceId: SASKTODAY_AUDIENCE_ID,
-    interestId: '4',
+    interestId: '7cb137b2ea',
     label: 'SaskToday Weekly'
   },
   'saskagtoday-daily': {
     audienceId: SASKTODAY_AUDIENCE_ID,
-    interestId: '64',
+    interestId: '8ec9e02d98',
     label: 'SaskAgToday Daily'
   },
   'crime-cops-court-daily': {
     audienceId: SASKTODAY_AUDIENCE_ID,
-    interestId: '16',
+    interestId: '4dd03444bf',
     label: 'Crime, Cops & Court Daily'
   },
   'sportscage-insider': {
     audienceId: SPORTSCAGE_AUDIENCE_ID,
-    interestId: '1',
+    interestId: 'e87c90a88d',
     label: 'SportsCage Insider'
   }
 };

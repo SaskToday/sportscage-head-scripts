@@ -57,4 +57,15 @@ describe('resolveInterestKeys', () => {
       expect(INTERESTS[key], key).toBeTruthy();
     }
   });
+
+  it('uses Marketing API interest ids (not short embed bits)', () => {
+    expect(INTERESTS['saskatoontoday-daily'].interestId).toBe('8d20fcd7c5');
+    expect(INTERESTS['estevantoday-daily'].interestId).toBe('e83801031f');
+    expect(INTERESTS['sasktoday-daily'].interestId).toBe('1f6feffe71');
+    expect(INTERESTS['sasktoday-weekly'].interestId).toBe('7cb137b2ea');
+    expect(INTERESTS['saskagtoday-daily'].interestId).toBe('8ec9e02d98');
+    expect(INTERESTS['crime-cops-court-daily'].interestId).toBe('4dd03444bf');
+    expect(INTERESTS['sportscage-insider'].interestId).toBe('e87c90a88d');
+    expect(INTERESTS['sportscage-insider'].audienceId).toBe(SPORTSCAGE_AUDIENCE_ID);
+  });
 });
