@@ -263,7 +263,7 @@
       '}' +
       '.st-signup-card { margin-top: 40px; background: var(--green-bg); border: 2px solid var(--green); border-radius: 2px; padding: 28px; box-shadow: 8px 8px 0 0 var(--ink); }' +
       '@media (min-width: 640px) { .st-signup-card { padding: 32px; } }' +
-      '.st-signup-card__head h2 { font-family: var(--display) !important; font-weight: 900; font-size: 28px; margin: 0; text-transform: none; line-height: 1.1; letter-spacing: -0.02em; color: var(--ink); }' +
+      '.st-signup-card__head h2 { font-family: var(--display) !important; font-weight: 900; font-size: 28px; margin: 0; text-transform: uppercase; line-height: 1.1; letter-spacing: -0.02em; color: var(--ink); }' +
       '.st-nl-green { color: var(--green) !important; }' +
       '.st-signup-card__sub { margin: 10px 0 0; font-size: 14px; color: rgba(16,26,20,.7); line-height: 1.5; }' +
       '.st-signup-card__legal { margin-top: 20px; font-size: 11px; line-height: 1.6; color: var(--ink-55); }' +
