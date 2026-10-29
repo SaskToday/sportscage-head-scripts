@@ -258,7 +258,8 @@ async function handleSubscribe(
       email,
       interests: targets,
       interestKeys,
-      widgetVersion
+      widgetVersion,
+      signupIp: ip
     });
 
     if (result.kind === 'ok' || result.kind === 'member_state') {

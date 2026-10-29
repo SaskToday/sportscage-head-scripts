@@ -93,8 +93,8 @@ Do the cheap checks first and the expensive ones last.
    - `PUT https://{dc}.api.mailchimp.com/3.0/lists/{audience_id}/members/{subscriber_hash}` (`audience_id` and the interest ID both come from the `INTERESTS` entry)
    - Basic auth with any username and the API key as the password.
    - First `GET` the member. Then `PUT`:
-     - **New / subscribed / pending:** `{ email_address, status_if_new: "pending", interests }` (no `status` — subscribed members keep status).
-     - **Unsubscribed:** `{ email_address, status: "pending", interests }` — fresh confirmation email; interests from this signup are stored on the pending member and remain after they confirm.
+     - **New / subscribed / pending:** `{ email_address, status_if_new: "pending", interests }` (no `status` — subscribed members keep status). For **new** contacts also set `ip_signup` from `CF-Connecting-IP` so Mailchimp's Signup IP is filled. Do **not** set `ip_opt` — Mailchimp sets opt-in IP when they click confirm.
+     - **Unsubscribed:** `{ email_address, status: "pending", interests, ip_signup }` — fresh confirmation email; interests from this signup are stored on the pending member and remain after they confirm.
      - **Cleaned:** do not force a resubscribe; treat as member-state (generic 200).
    - Only the listed interests change, so existing groups are preserved.
    - Use a timeout. Map Mailchimp errors by error type (the `title`/`detail` in the response body), not by status class:

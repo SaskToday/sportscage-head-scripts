@@ -235,6 +235,29 @@ export async function trackMemberEvent(opts: {
 }
 
 /**
+ * Mailchimp validates ip_signup / ip_opt as real IPv4/IPv6.
+ * Skip placeholders and loopback so we never wipe a blank with junk.
+ */
+export function isUsableClientIp(ip: string | undefined | null): ip is string {
+  if (!ip) return false;
+  const v = ip.trim();
+  if (
+    !v ||
+    v === '0.0.0.0' ||
+    v === '::' ||
+    v === '::1' ||
+    v === '127.0.0.1'
+  ) {
+    return false;
+  }
+  // IPv4
+  if (/^(?:\d{1,3}\.){3}\d{1,3}$/.test(v)) return true;
+  // IPv6 (Cloudflare CF-Connecting-IP)
+  if (v.includes(':') && /^[0-9a-fA-F:.]+$/.test(v)) return true;
+  return false;
+}
+
+/**
  * Upsert interests on a member.
  *
  * - New / subscribed / pending: only `status_if_new: pending` (no `status`),
@@ -245,6 +268,9 @@ export async function trackMemberEvent(opts: {
  * - Cleaned / compliance: treated as member_state (generic success to client).
  * - After a successful upsert, record a custom Activity event (new + existing)
  *   including widget_version when provided.
+ * - For new / resubscribe contacts, set `ip_signup` from CF-Connecting-IP
+ *   so Mailchimp's "Signup IP address" is populated. Do not set `ip_opt` —
+ *   Mailchimp fills that when they confirm the double-opt-in link.
  */
 export async function upsertMemberInterests(opts: {
   apiKey: string;
@@ -256,6 +282,8 @@ export async function upsertMemberInterests(opts: {
   interestKeys?: string[];
   /** Front-end widget build version from WIDGET_CHANGELOG.md */
   widgetVersion?: string;
+  /** Client IP (CF-Connecting-IP) for Mailchimp ip_signup on new / resubscribe */
+  signupIp?: string;
   timeoutMs?: number;
 }): Promise<MailchimpOutcome> {
   const lookup = await getMemberStatus(opts);
@@ -274,6 +302,7 @@ export async function upsertMemberInterests(opts: {
   }
 
   const resubscribe = lookup.status === 'unsubscribed';
+  const isNew = lookup.status === 'missing';
   const body: Record<string, unknown> = {
     email_address: opts.email,
     interests: interestsBody
@@ -286,6 +315,12 @@ export async function upsertMemberInterests(opts: {
   } else {
     // New contacts become pending; subscribed/pending keep their status.
     body.status_if_new = 'pending';
+  }
+
+  // Signup IP only on new / resubscribe — don't overwrite historical signup IP
+  // on preference updates for already-subscribed members.
+  if ((isNew || resubscribe) && isUsableClientIp(opts.signupIp)) {
+    body.ip_signup = opts.signupIp.trim();
   }
 
   const controller = new AbortController();
