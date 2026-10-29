@@ -4,11 +4,12 @@ Cloudflare Worker that replaces Mailchimp embed POSTs. The browser posts JSON to
 
 ## Why
 
-Mailchimp’s classic embed form does **not** add interest groups when the email is already on the list. This Worker uses the Marketing API `PUT /lists/{id}/members/{hash}` with `status_if_new: "pending"` (no `status` field) so:
+Mailchimp’s classic embed form does **not** add interest groups when the email is already on the list. This Worker uses the Marketing API so:
 
-- New contacts are double opt-in (`pending`) with the group set
-- Existing subscribed contacts get the new group without losing others or changing status
-- Unsubscribed / cleaned contacts are not silently re-subscribed (member-state errors return the same generic 200)
+- **New** contacts are double opt-in (`pending`) with the interest group(s) set
+- **Subscribed** contacts get the new group(s) without losing others or changing status
+- **Unsubscribed** contacts are set back to `pending` (fresh confirmation email) **with this signup’s interest group(s) already applied** — those interests remain after they confirm
+- **Cleaned** contacts are not re-subscribed; the client still gets the generic 200 (no enumeration)
 
 ## Setup
 

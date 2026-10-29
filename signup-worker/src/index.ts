@@ -242,7 +242,12 @@ async function handleSubscribe(
 
     if (result.kind === 'ok' || result.kind === 'member_state') {
       log({
-        outcome: result.kind === 'ok' ? 'subscribed' : 'member_state',
+        outcome:
+          result.kind === 'member_state'
+            ? 'member_state'
+            : result.resubscribed
+              ? 'resubscribe_pending'
+              : 'subscribed',
         emailHash,
         interests: interestKeys,
         audienceId,

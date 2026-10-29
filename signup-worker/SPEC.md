@@ -6,7 +6,8 @@ Replace the Mailchimp embed forms with our own front-end forms that post to a Cl
 
 - New contacts are added as `pending` (double opt-in) with the interest group set.
 - Existing subscribers get the new interest group added, without losing existing groups and without changing their subscription status.
-- Unsubscribed or cleaned contacts are never silently re-subscribed.
+- Unsubscribed contacts are moved to `pending` (fresh double opt-in) with this signup’s interest group(s) set; those interests remain after they confirm.
+- Cleaned contacts are never silently re-subscribed (generic 200 to the client).
 - Bot abuse is limited by Turnstile, rate limits, a honeypot and a circuit breaker that shuts signups off and alerts us.
 
 ## Stack
