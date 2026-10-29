@@ -32,10 +32,14 @@
     },
 
     'saskatoon-today': {
-      title: 'SaskatoonToday',
-      titleStyle: 'today',
-      description:
-        'Discover everything happening in Saskatoon in a 5-minute read. Breaking news, community events, obituaries and more.',
+      layout: 'tagline-lead',
+      accent: '#016a1b',
+      whisker: 'SaskatoonToday Daily Newsletter',
+      headlineBefore: 'Everything ',
+      headlineAccent: 'Saskatoon',
+      headlineAfter: ' in a five-minute read.',
+      body: 'Key Saskatoon news in one daily newsletter, delivered daily.',
+      legalBrand: 'SaskatoonToday',
       formAction:
         'https://sasktoday.us18.list-manage.com/subscribe/post?u=115183fbae903a83f5f107dab&id=b666fb9950&f_id=00cab6e6f0',
       honeypot: 'b_115183fbae903a83f5f107dab_b666fb9950',
@@ -45,10 +49,14 @@
     },
 
     'estevan-today': {
-      title: 'EstevanToday',
-      titleStyle: 'today',
-      description:
-        'Discover everything happening in Estevan in a 5-minute read. Breaking news, community events, obituaries and more.',
+      layout: 'tagline-lead',
+      accent: '#016a1b',
+      whisker: 'EstevanToday Daily Newsletter',
+      headlineBefore: 'Everything ',
+      headlineAccent: 'Estevan',
+      headlineAfter: ' in a five-minute read.',
+      body: 'Key Estevan news in one daily newsletter, delivered daily.',
+      legalBrand: 'EstevanToday',
       formAction:
         'https://sasktoday.us18.list-manage.com/subscribe/post?u=115183fbae903a83f5f107dab&id=b666fb9950&f_id=00cab6e6f0',
       honeypot: 'b_115183fbae903a83f5f107dab_b666fb9950',
@@ -61,10 +69,14 @@
     // 'yorkton-today': { ... },
 
     sasktoday: {
-      title: 'SaskToday',
-      titleStyle: 'today',
-      description:
-        'Discover everything happening in Sask in a 5-minute read. Breaking news, community events, obituaries and more.',
+      layout: 'tagline-lead',
+      accent: '#016a1b',
+      whisker: 'SaskToday Daily Newsletter',
+      headlineBefore: 'Everything ',
+      headlineAccent: 'Sask',
+      headlineAfter: ' in a five-minute read.',
+      body: 'Key Sask news in one daily newsletter, delivered daily.',
+      legalBrand: 'SaskToday',
       formAction:
         'https://sasktoday.us18.list-manage.com/subscribe/post?u=115183fbae903a83f5f107dab&id=b666fb9950&f_id=00cab6e6f0',
       honeypot: 'b_115183fbae903a83f5f107dab_b666fb9950',
@@ -78,10 +90,15 @@
     },
 
     'saskag-today': {
-      title: 'SaskAgToday',
-      titleStyle: 'plain', // one word, all black
-      description:
-        'Get daily grain prices, precise weather forecasts, ag news and exclusive content from SaskAgToday directly to your inbox. Delivers daily, Monday - Friday.',
+      layout: 'tagline-lead',
+      accent: '#016a1b',
+      whisker: 'SaskAgToday Daily Newsletter',
+      headlineBefore: 'Key ',
+      headlineAccent: 'Agriculture',
+      headlineAfter: ' news in a five-minute read.',
+      body:
+        'The latest ag news, grain prices and precision weather forecasts. Delivered to you 5 days a week, Monday to Friday.',
+      legalBrand: 'SaskAgToday',
       formAction:
         'https://sasktoday.us18.list-manage.com/subscribe/post?u=115183fbae903a83f5f107dab&id=b666fb9950&f_id=00cab6e6f0',
       honeypot: 'b_115183fbae903a83f5f107dab_b666fb9950',
@@ -91,11 +108,16 @@
     },
 
     sportscage: {
-      title: 'SportsCage',
-      titleStyle: 'plain',
-      description:
-        'Become the expert on Sask Sports. From Riders exclusives to SJHL recaps, SportsCage breaks down everything you need to know from the world of Sask sports in our daily newsletter.',
-      // Main SportsCage Insider list (from existing SportsCage site script — not Riders)
+      layout: 'tagline-lead',
+      accent: '#016a1b',
+      whisker: 'SportsCage Insider Report',
+      // Mirrored from SportsCage site Insider widget (not Riders)
+      headlineBefore: '',
+      headlineAccent: 'Insider',
+      headlineAfter: ' Report',
+      body:
+        'Covering all Saskatchewan sports. Here you\'ll find updates on everything from WHL to Curling to Baseball. Sends daily.',
+      legalBrand: 'SportsCage',
       formAction:
         'https://harvardmedia.us18.list-manage.com/subscribe/post?u=115183fbae903a83f5f107dab&id=e0e70bc1df&f_id=002cb1e6f0',
       honeypot: 'b_115183fbae903a83f5f107dab_e0e70bc1df',
@@ -105,10 +127,15 @@
     },
 
     'crime-cops-court': {
-      title: 'Crime, Cops & Court',
-      titleStyle: 'plain',
-      description:
-        "Sask Crime evolves quickly. We'll keep you in the loop. Get the latest crime updates from around Sask in our Crime, Cops & Court Report. Delivered 5-days a week to your inbox, Monday - Friday.",
+      layout: 'tagline-lead',
+      accent: '#016a1b',
+      whisker: 'Crime, Cops & Court Newsletter',
+      headlineBefore: '',
+      headlineAccent: 'Sask Crime',
+      headlineAfter: " evolves quickly. We'll keep you in the loop.",
+      body:
+        'Get the latest crime updates from around Sask in our Crime, Cops & Court Report. Delivered 5-days a week to your inbox, Monday - Friday.',
+      legalBrand: 'SaskToday',
       formAction:
         'https://sasktoday.us18.list-manage.com/subscribe/post?u=115183fbae903a83f5f107dab&id=b666fb9950&f_id=00cab6e6f0',
       honeypot: 'b_115183fbae903a83f5f107dab_b666fb9950',
@@ -385,6 +412,23 @@
       '.st-tl-card .response { font-size: 13px; padding: 8px 0; }' +
       '.st-tl-card #mce-error-response { color: var(--danger); }' +
       '.st-tl-card #mce-success-response { color: var(--accent-hover); }' +
+      '.st-tl-card .st-nl-choices { border: 0; margin: 16px 0 0; padding: 0; }' +
+      '.st-tl-card .st-nl-choices legend {' +
+      '  font-size: 12px; line-height: 1; font-weight: 700;' +
+      '  letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted);' +
+      '  padding: 0; margin-bottom: 10px;' +
+      '}' +
+      '.st-tl-card .st-nl-choices__list { display: flex; flex-direction: column; gap: 10px; }' +
+      '.st-tl-card .st-nl-choice {' +
+      '  display: flex; align-items: center; gap: 10px;' +
+      '  font-size: 17px; color: var(--ink); cursor: pointer;' +
+      '}' +
+      '.st-tl-card .st-nl-choice input {' +
+      '  width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer;' +
+      '}' +
+      '.st-tl-card .st-nl-choices__error {' +
+      '  margin: 8px 0 0; font-size: 13px; color: var(--danger);' +
+      '}' +
       '.st-tl-card__legal {' +
       '  margin: 4px 0 0; font-size: 14px; line-height: 1.55; color: var(--muted);' +
       '}' +
@@ -395,9 +439,11 @@
       '</div>' +
       '  <h1 class="st-tl-card__headline">' +
       escapeHtml(config.headlineBefore || '') +
-      '<span class="st-tl-card__headline-accent">' +
-      escapeHtml(config.headlineAccent || '') +
-      '</span>' +
+      (config.headlineAccent
+        ? '<span class="st-tl-card__headline-accent">' +
+          escapeHtml(config.headlineAccent) +
+          '</span>'
+        : '') +
       escapeHtml(config.headlineAfter || '') +
       '</h1>' +
       '  <p class="st-tl-card__body">' +
