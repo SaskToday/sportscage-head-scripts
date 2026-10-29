@@ -92,16 +92,11 @@ Do the cheap checks first and the expensive ones last.
    - `subscriber_hash = md5(lowercase(email))`
    - `PUT https://{dc}.api.mailchimp.com/3.0/lists/{audience_id}/members/{subscriber_hash}` (`audience_id` and the interest ID both come from the `INTERESTS` entry)
    - Basic auth with any username and the API key as the password.
-   - Body:
-     ```json
-     {
-       "email_address": "user@example.com",
-       "status_if_new": "pending",
-       "interests": { "GROUP_ID": true }
-     }
-     ```
+   - First `GET` the member. Then `PUT`:
+     - **New / subscribed / pending:** `{ email_address, status_if_new: "pending", interests }` (no `status` — subscribed members keep status).
+     - **Unsubscribed:** `{ email_address, status: "pending", interests }` — fresh confirmation email; interests from this signup are stored on the pending member and remain after they confirm.
+     - **Cleaned:** do not force a resubscribe; treat as member-state (generic 200).
    - Only the listed interests change, so existing groups are preserved.
-   - Do not send a `status` field. Existing members keep their status. `status_if_new` only applies to new contacts.
    - Use a timeout. Map Mailchimp errors by error type (the `title`/`detail` in the response body), not by status class:
      - **Member-state errors** (compliance state, forgotten email, cleaned or unsubscribed contacts that can't be updated): return the same generic 200 success as every other case. Never return an error, since that would reveal the address is special. Log server-side only.
      - **Invalid or fake-looking email** (depends on the address, not on our list): return 400 "please check your email address".
