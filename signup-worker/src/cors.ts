@@ -1,12 +1,26 @@
 import { parseList } from './env';
 
+/** Allow exact listed origins, plus any port on localhost / 127.0.0.1 for local previews. */
 export function getAllowedOrigin(
   originHeader: string | null,
   allowedCsv: string
 ): string | null {
   if (!originHeader) return null;
   const allowed = parseList(allowedCsv);
-  return allowed.includes(originHeader) ? originHeader : null;
+  if (allowed.includes(originHeader)) return originHeader;
+
+  try {
+    const url = new URL(originHeader);
+    const localHost =
+      url.hostname === 'localhost' || url.hostname === '127.0.0.1';
+    if (url.protocol === 'http:' && localHost) {
+      return originHeader;
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
 }
 
 export function corsHeaders(origin: string): HeadersInit {

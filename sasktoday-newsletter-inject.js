@@ -533,17 +533,21 @@
           } else {
             setStatus(
               statusEl,
-              data.message || 'Something went wrong. Please try again later.',
+              (data.message || 'Something went wrong. Please try again later.') +
+                (data.code ? ' (' + data.code + ')' : ''),
               'error'
             );
           }
         })
-        .catch(function () {
+        .catch(function (err) {
           setStatus(
             statusEl,
-            'Something went wrong. Please try again later.',
+            'Something went wrong. Please try again later. (network/cors)',
             'error'
           );
+          if (typeof console !== 'undefined' && console.error) {
+            console.error('SaskToday signup failed', err);
+          }
         })
         .then(function () {
           if (submitBtn) submitBtn.disabled = false;

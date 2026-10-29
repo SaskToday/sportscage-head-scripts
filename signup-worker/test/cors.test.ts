@@ -17,4 +17,13 @@ describe('getAllowedOrigin', () => {
       'https://www.sasktoday.ca'
     );
   });
+
+  it('allows any localhost / 127.0.0.1 http port for local previews', () => {
+    expect(getAllowedOrigin('http://127.0.0.1:8766', allowed)).toBe(
+      'http://127.0.0.1:8766'
+    );
+    expect(getAllowedOrigin('http://localhost:9999', allowed)).toBe(
+      'http://localhost:9999'
+    );
+  });
 });
