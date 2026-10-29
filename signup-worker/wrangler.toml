@@ -2,6 +2,8 @@ name = "sasktoday-signup"
 main = "src/index.ts"
 compatibility_date = "2026-10-29"
 compatibility_flags = ["nodejs_compat"]
+workers_dev = true
+preview_urls = true
 
 # Create with: wrangler kv namespace create SIGNUP_STATE
 # Then paste the id below (staging and production can share or use separate namespaces).
