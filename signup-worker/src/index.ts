@@ -206,8 +206,8 @@ async function handleSubscribe(
 
   // Rate limits (IP + email)
   const emailHash = await sha256Hex(email);
-  const ipLimit = num(env.IP_MAX_PER_HOUR, 10);
-  const emailLimit = num(env.EMAIL_MAX_PER_HOUR, 3);
+  const ipLimit = num(env.IP_MAX_PER_HOUR, 20);
+  const emailLimit = num(env.EMAIL_MAX_PER_HOUR, 10);
   const hb = hourBucket();
 
   const ipCount = await incr(

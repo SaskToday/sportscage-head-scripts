@@ -20,8 +20,10 @@ ALLOWED_ORIGINS = "https://www.sasktoday.ca,https://sasktoday.ca,http://127.0.0.
 # Comma-separated hostnames allowed on Turnstile siteverify responses
 TURNSTILE_ALLOWED_HOSTNAMES = "www.sasktoday.ca,sasktoday.ca,127.0.0.1,localhost"
 BODY_MAX_BYTES = "2048"
-EMAIL_MAX_PER_HOUR = "3"
-IP_MAX_PER_HOUR = "10"
+# Email: room for all path-based newsletter widgets + a couple retries
+EMAIL_MAX_PER_HOUR = "10"
+# IP: a bit above email so shared Wi‑Fi / office NAT isn't the first limiter
+IP_MAX_PER_HOUR = "20"
 BREAKER_MAX_SIGNUPS_PER_HOUR = "100"
 BREAKER_MAX_MAILCHIMP_ERRORS_PER_5MIN = "20"
 BREAKER_COOLDOWN_SECONDS = "3600"

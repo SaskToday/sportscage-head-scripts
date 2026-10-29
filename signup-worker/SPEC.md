@@ -40,8 +40,8 @@ Replace the Mailchimp embed forms with our own front-end forms that post to a Cl
 | `BREAKER_MAX_MAILCHIMP_ERRORS_PER_5MIN` | e.g. `20` |
 | `BODY_MAX_BYTES` | `2048` |
 | `BREAKER_COOLDOWN_SECONDS` | e.g. `3600` |
-| `EMAIL_MAX_PER_HOUR` | `3` |
-| `IP_MAX_PER_HOUR` | `10` |
+| `EMAIL_MAX_PER_HOUR` | `10` |
+| `IP_MAX_PER_HOUR` | `20` |
 
 ### Interest map (in code, e.g. `src/interests.ts`)
 
