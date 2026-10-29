@@ -253,21 +253,24 @@
   function buildCardHtml(config) {
     return (
       '<style type="text/css">' +
+      // Card chrome mirrors SportsCage Riders widget (white bg, ink border, green shadow)
       '.st-signup-card {' +
       '  --ink: #101a14;' +
       '  --ink-55: rgba(16,26,20,.55);' +
-      '  --green: #016a1b;' +
-      '  --green-deep: #014814;' +
-      '  --green-bg: rgba(1,106,27,.06);' +
+      '  --ink-50: rgba(16,26,20,.50);' +
+      '  --green: #1f7a4d;' +
+      '  --green-deep: #155a39;' +
+      '  --title-green: #016a1b;' +
       '  --display: "Montserrat", "Arial Black", sans-serif;' +
       '}' +
-      '.st-signup-card { margin-top: 40px; background: var(--green-bg); border: 2px solid var(--green); border-radius: 2px; padding: 28px; box-shadow: 8px 8px 0 0 var(--ink); }' +
+      '.st-signup-card { margin-top: 40px; background: #fff; border: 2px solid var(--ink); border-radius: 2px; padding: 28px; box-shadow: 8px 8px 0 0 var(--green); }' +
       '@media (min-width: 640px) { .st-signup-card { padding: 32px; } }' +
       '.st-signup-card__head h2 { font-family: var(--display) !important; font-weight: 900; font-size: 28px; margin: 0; text-transform: uppercase; line-height: 1.1; letter-spacing: -0.02em; color: var(--ink); }' +
-      '.st-nl-green { color: var(--green) !important; }' +
+      '.st-nl-green { color: var(--title-green) !important; }' +
       '.st-signup-card__sub { margin: 10px 0 0; font-size: 14px; color: rgba(16,26,20,.7); line-height: 1.5; }' +
       '.st-signup-card__legal { margin-top: 20px; font-size: 11px; line-height: 1.6; color: var(--ink-55); }' +
       '.st-signup-card__legal a { text-decoration: underline; color: inherit; }' +
+      '#mc_embed_signup .button { height: auto !important; }' +
       '.st-mc-host { margin-top: 24px; }' +
       '.st-mc-host #mc_embed_signup { background: transparent; clear: left; font: inherit; width: 100%; }' +
       '.st-mc-host #mc_embed_signup form { padding: 0; margin: 0; }' +
@@ -277,8 +280,8 @@
       '.st-mc-host #mce-EMAIL { width: 100%; background: transparent; border: 0; border-bottom: 2px solid var(--ink); border-radius: 0; padding: 10px 0 12px; font-size: 18px; font-family: inherit; color: var(--ink); outline: none; transition: border-color .2s ease; box-sizing: border-box; }' +
       '.st-mc-host #mce-EMAIL:focus { border-bottom-color: var(--green); }' +
       '.st-mc-host .clear { margin-top: 18px; }' +
-      '.st-mc-host #mc-embedded-subscribe { -webkit-appearance: none; appearance: none; width: 100%; background: var(--green); color: #fff; border: 0; border-radius: 2px; padding: 16px 20px; font-family: inherit; font-size: 13px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; cursor: pointer; transition: background .2s ease, transform .15s ease; }' +
-      '.st-mc-host #mc-embedded-subscribe:hover { background: var(--green-deep); }' +
+      '.st-mc-host #mc-embedded-subscribe { -webkit-appearance: none; appearance: none; width: 100%; background: var(--ink); color: #fff; border: 0; border-radius: 2px; padding: 16px 20px; font-family: inherit; font-size: 13px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; cursor: pointer; transition: background .2s ease, transform .15s ease; }' +
+      '.st-mc-host #mc-embedded-subscribe:hover { background: var(--green); }' +
       '.st-mc-host #mc-embedded-subscribe:active { transform: translateY(1px); }' +
       '.st-mc-host .response { font-size: 13px; padding: 8px 0; }' +
       '.st-mc-host #mce-error-response { color: #b3261e; }' +
