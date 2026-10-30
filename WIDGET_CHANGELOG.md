@@ -13,6 +13,10 @@ Use the tag / commit SHA later if you need to check out exactly that UI.
 
 ## Version history
 
+### 1.3.2 — 2026-10-30
+
+- Production style polish: reset `legend` underline inheritance, keep accent shadow inside the host slot, ~30% smaller headline/body/legal type
+
 ### 1.3.1 — 2026-10-30
 
 - Turnstile warms only on form engagement (focus / pointer), not viewport — better for above-the-fold embeds

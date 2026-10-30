@@ -52,3 +52,26 @@ body {
 /* Kill the card's top margin in previews so it sits cleanly in the stage */
 .preview-stage .st-signup-card,
 .preview-stage .st-tl-card { margin-top: 0; }
+
+/*
+ * Simulate hostile host-template legend styles (SaskToday-like) so we can
+ * verify the widget's legend resets. The inject CSS must win over these.
+ */
+legend {
+  border-bottom: 1px solid #ccc;
+  text-decoration: underline;
+  padding-bottom: 6px;
+  width: 100%;
+}
+legend::after {
+  content: "";
+  display: block;
+  border-bottom: 2px solid #016a1b;
+  margin-top: 4px;
+}
+
+/* Narrow host slot to confirm green accent shadow stays inside */
+.preview-stage {
+  outline: 1px dashed rgba(1, 106, 27, 0.35);
+  overflow: hidden;
+}
