@@ -11,9 +11,12 @@ import type { Env } from './env';
 export async function sendAlert(
   env: Env,
   payload: Record<string, unknown>
-): Promise<void> {
+): Promise<boolean> {
   const url = env.ALERT_WEBHOOK_URL;
-  if (!url) return;
+  if (!url) {
+    console.log(JSON.stringify({ outcome: 'alert_skipped', reason: 'no_webhook' }));
+    return false;
+  }
 
   const text =
     typeof payload.text === 'string'
@@ -35,10 +38,16 @@ export async function sendAlert(
           detail: (await res.text()).slice(0, 200)
         })
       );
+      return false;
     }
+    console.log(
+      JSON.stringify({ outcome: 'alert_sent', status: res.status })
+    );
+    return true;
   } catch {
     // Never fail the request because alerting failed
     console.log(JSON.stringify({ outcome: 'alert_failed' }));
+    return false;
   }
 }
 
@@ -51,9 +60,11 @@ export async function sendAlertOnce(
 ): Promise<boolean> {
   const existing = await env.SIGNUP_STATE.get(guardKey);
   if (existing) return false;
+  const ok = await sendAlert(env, payload);
+  if (!ok) return false;
+  // Only dedupe after a successful webhook POST so a bad URL can be retried.
   await env.SIGNUP_STATE.put(guardKey, '1', {
     expirationTtl: Math.max(60, ttlSeconds)
   });
-  await sendAlert(env, payload);
   return true;
 }
