@@ -37,12 +37,16 @@ See [`widget-snapshots/README.md`](widget-snapshots/README.md).
 | `regina-today` | `1.0.0` | Launch copy |
 | `saskatoon-today` | `1.0.0` | Launch copy |
 | `estevan-today` | `1.0.0` | Launch copy |
-| `sasktoday` | `1.0.0` | Launch copy + daily/weekly choices |
+| `sasktoday` | `1.0.1` | Body: “We compile the most important Sask news…” |
 | `saskag-today` | `1.0.0` | Launch copy |
 | `sportscage` | `1.0.0` | Launch copy |
 | `crime-cops-court` | `1.0.0` | Launch copy |
 
 ## Shell version history
+
+### 1.4.1 — 2026-10-30
+
+- CDN rebuild for `sasktoday@1.0.1` body copy (no shared UI changes)
 
 ### 1.4.0 — 2026-10-30
 

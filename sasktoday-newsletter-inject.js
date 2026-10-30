@@ -12,7 +12,7 @@
   // Each NEWSLETTERS entry also has its own `version` for copy/interest changes.
   // Sent to the API as `{newsletterKey}@{newsletterVersion}+{WIDGET_VERSION}`.
   // Bump the relevant piece and note it in WIDGET_CHANGELOG.md.
-  var WIDGET_VERSION = '1.4.0';
+  var WIDGET_VERSION = '1.4.1';
 
   // ---------------------------------------------------------------------------
   // DEPLOY CONFIG — set after Worker + Turnstile are live
@@ -81,14 +81,14 @@
     // 'yorkton-today': { version: '1.0.0', ..., interestKey: 'yorktontoday-daily' },
 
     sasktoday: {
-      version: '1.0.0',
+      version: '1.0.1',
       layout: 'tagline-lead',
       accent: '#016a1b',
       whisker: 'SaskToday Daily Newsletter',
       headlineBefore: 'Everything ',
       headlineAccent: 'Sask',
       headlineAfter: ' in a five-minute read.',
-      body: 'Key Sask news in one daily newsletter, delivered daily.',
+      body: 'We compile the most important Sask news and deliver it to your inbox.',
       legalBrand: 'SaskToday',
       // Daily defaulted; Weekly optional — keys match Worker INTERESTS map
       interestChoices: [

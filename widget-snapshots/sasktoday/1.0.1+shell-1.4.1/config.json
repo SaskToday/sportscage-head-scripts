@@ -1,0 +1,31 @@
+{
+  "capturedAt": "2026-10-30T19:41:55.036Z",
+  "key": "sasktoday",
+  "newsletterVersion": "1.0.1",
+  "shellVersion": "1.4.1",
+  "widgetVersion": "sasktoday@1.0.1+1.4.1",
+  "preview": "previews/sasktoday.html",
+  "config": {
+    "version": "1.0.1",
+    "layout": "tagline-lead",
+    "accent": "#016a1b",
+    "whisker": "SaskToday Daily Newsletter",
+    "headlineBefore": "Everything ",
+    "headlineAccent": "Sask",
+    "headlineAfter": " in a five-minute read.",
+    "body": "We compile the most important Sask news and deliver it to your inbox.",
+    "legalBrand": "SaskToday",
+    "interestChoices": [
+      {
+        "key": "sasktoday-daily",
+        "label": "Daily Newsletter",
+        "checked": true
+      },
+      {
+        "key": "sasktoday-weekly",
+        "label": "Weekly Newsletter",
+        "checked": false
+      }
+    ]
+  }
+}

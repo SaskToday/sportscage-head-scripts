@@ -1,0 +1,20 @@
+{
+  "capturedAt": "2026-10-30T19:42:00.640Z",
+  "key": "sportscage",
+  "newsletterVersion": "1.0.0",
+  "shellVersion": "1.4.1",
+  "widgetVersion": "sportscage@1.0.0+1.4.1",
+  "preview": "previews/sportscage.html",
+  "config": {
+    "version": "1.0.0",
+    "layout": "tagline-lead",
+    "accent": "#016a1b",
+    "whisker": "SportsCage Insider Report",
+    "headlineBefore": "",
+    "headlineAccent": "Insider",
+    "headlineAfter": " Report",
+    "body": "Covering all Saskatchewan sports. Here you'll find updates on everything from WHL to Curling to Baseball. Sends daily.",
+    "legalBrand": "SportsCage",
+    "interestKey": "sportscage-insider"
+  }
+}
