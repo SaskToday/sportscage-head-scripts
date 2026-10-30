@@ -107,19 +107,40 @@ Update `src/interests.ts` if IDs differ from the embed-derived values.
 npm run deploy
 ```
 
-Point the front-end at the Worker:
+## Production: add the widget to the site
+
+The inject script is hosted on the same Worker (Cloudflare):
+
+`https://sasktoday-signup.nmorrison.workers.dev/sasktoday-newsletter-inject.js`
+
+1. Ensure the page has the slot (you already do):
+
+```html
+<div id="newsletter_signup_inject_container"></div>
+```
+
+2. Near the end of `<body>` (after that div), add config + script:
 
 ```html
 <script>
   window.SASKTODAY_SIGNUP = {
-    apiUrl: 'https://sasktoday-signup.<your-subdomain>.workers.dev/subscribe',
-    turnstileSiteKey: '<TURNSTILE_SITE_KEY>'
+    apiUrl: 'https://sasktoday-signup.nmorrison.workers.dev/subscribe',
+    turnstileSiteKey: '0x4AAAAAAFrrf0dzX9fWkC6B'
   };
 </script>
-<script src="/path/to/sasktoday-newsletter-inject.js"></script>
+<script
+  src="https://sasktoday-signup.nmorrison.workers.dev/sasktoday-newsletter-inject.js?v=1.2.0"
+  defer
+></script>
 ```
 
-Also set `ALLOWED_ORIGINS` and `TURNSTILE_ALLOWED_HOSTNAMES` in `wrangler.toml` to your real hosts.
+Bump `?v=` when you ship a new `WIDGET_VERSION` so browsers pick up the file.
+
+Path targeting (Regina / Saskatoon / etc.) uses `window.location.pathname` automatically — no per-section script changes.
+
+After `npm run deploy`, `predeploy` syncs `../sasktoday-newsletter-inject.js` into `public/` so the CDN copy matches the repo.
+
+Also set `ALLOWED_ORIGINS` and `TURNSTILE_ALLOWED_HOSTNAMES` in `wrangler.toml` to your real hosts (already includes `sasktoday.ca` / `www.sasktoday.ca`).
 
 ## Circuit breaker reset
 

@@ -4,8 +4,10 @@
   "private": true,
   "description": "Mailchimp interest-group signup Worker for SaskToday / SportsCage",
   "scripts": {
-    "dev": "wrangler dev",
+    "dev": "npm run sync:widget && wrangler dev",
+    "predeploy": "npm run sync:widget",
     "deploy": "wrangler deploy",
+    "sync:widget": "bash scripts/sync-widget-asset.sh",
     "types": "wrangler types",
     "test": "vitest run",
     "test:watch": "vitest",

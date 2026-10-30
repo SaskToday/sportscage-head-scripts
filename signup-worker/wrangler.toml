@@ -36,6 +36,13 @@ TURNSTILE_FAIL_BLOCK_SECONDS = "600"
 [triggers]
 crons = ["10 6 * * *"]
 
+# Hosts sasktoday-newsletter-inject.js at the Worker URL (synced from repo root on deploy).
+[assets]
+directory = "./public"
+binding = "ASSETS"
+# API routes always hit the Worker; static JS is served from assets.
+run_worker_first = ["/subscribe", "/ops/*"]
+
 [observability]
 enabled = true
 

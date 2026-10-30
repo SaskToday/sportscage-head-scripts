@@ -1,5 +1,7 @@
 export interface Env {
   SIGNUP_STATE: KVNamespace;
+  /** Static assets (inject script). Optional in unit tests. */
+  ASSETS?: Fetcher;
 
   MAILCHIMP_API_KEY: string;
   TURNSTILE_SECRET: string;

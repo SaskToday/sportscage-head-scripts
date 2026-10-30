@@ -359,50 +359,54 @@ export default {
       });
     }
 
-    if (url.pathname !== '/subscribe') {
-      return new Response('Not found', { status: 404 });
-    }
-
-    const origin = getAllowedOrigin(
-      request.headers.get('Origin'),
-      env.ALLOWED_ORIGINS
-    );
-
-    if (request.method === 'OPTIONS') {
-      if (!origin) return new Response(null, { status: 403 });
-      return new Response(null, { status: 204, headers: corsHeaders(origin) });
-    }
-
-    if (request.method !== 'POST') {
-      return new Response('Method not allowed', { status: 405 });
-    }
-
-    // Missing or disallowed Origin → reject
-    if (!origin) {
-      log({ outcome: 'origin_rejected' });
-      return new Response(JSON.stringify({ ok: false, code: 'origin_rejected' }), {
-        status: 403,
-        headers: { 'content-type': 'application/json; charset=utf-8' }
-      });
-    }
-
-    try {
-      return await handleSubscribe(request, env, origin);
-    } catch (e) {
-      log({
-        outcome: 'unhandled',
-        error: e instanceof Error ? e.message : 'unknown'
-      });
-      return jsonResponse(
-        {
-          ok: false,
-          code: 'error',
-          message: 'Something went wrong. Please try again later.'
-        },
-        500,
-        origin
+    if (url.pathname === '/subscribe') {
+      const origin = getAllowedOrigin(
+        request.headers.get('Origin'),
+        env.ALLOWED_ORIGINS
       );
+
+      if (request.method === 'OPTIONS') {
+        if (!origin) return new Response(null, { status: 403 });
+        return new Response(null, { status: 204, headers: corsHeaders(origin) });
+      }
+
+      if (request.method !== 'POST') {
+        return new Response('Method not allowed', { status: 405 });
+      }
+
+      // Missing or disallowed Origin → reject
+      if (!origin) {
+        log({ outcome: 'origin_rejected' });
+        return new Response(JSON.stringify({ ok: false, code: 'origin_rejected' }), {
+          status: 403,
+          headers: { 'content-type': 'application/json; charset=utf-8' }
+        });
+      }
+
+      try {
+        return await handleSubscribe(request, env, origin);
+      } catch (e) {
+        log({
+          outcome: 'unhandled',
+          error: e instanceof Error ? e.message : 'unknown'
+        });
+        return jsonResponse(
+          {
+            ok: false,
+            code: 'error',
+            message: 'Something went wrong. Please try again later.'
+          },
+          500,
+          origin
+        );
+      }
     }
+
+    // Static assets (inject script) — or 404
+    if (env.ASSETS) {
+      return env.ASSETS.fetch(request);
+    }
+    return new Response('Not found', { status: 404 });
   },
 
   /** Daily digest: previous America/Edmonton day disposable % → Teams */
