@@ -45,4 +45,5 @@ enabled = true
 # Secrets (set via `wrangler secret put`, never commit):
 #   MAILCHIMP_API_KEY
 #   TURNSTILE_SECRET
-#   ALERT_WEBHOOK_URL
+#   ALERT_WEBHOOK_URL     — breaker / config / Turnstile wave (ops channel)
+#   DIGEST_WEBHOOK_URL    — daily disposable % digest (separate chat/channel)

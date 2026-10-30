@@ -97,11 +97,17 @@ export async function sendDisposableDailyDigest(
   );
 
   const text = formatDisposableDigest({ day, signups, disposable });
+  // Prefer DIGEST_WEBHOOK_URL (separate Teams chat/channel); fall back to ops webhook.
+  const digestUrl = env.DIGEST_WEBHOOK_URL || env.ALERT_WEBHOOK_URL;
   const sent = await sendAlertOnce(
     env,
     `alert:disposable_daily:${day}`,
     3 * 24 * 3600,
-    { text }
+    { text },
+    {
+      webhookUrl: digestUrl,
+      title: 'SaskToday signup digest'
+    }
   );
 
   console.log(

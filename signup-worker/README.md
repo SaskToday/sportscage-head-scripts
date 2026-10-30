@@ -25,37 +25,46 @@ npx wrangler kv namespace create SIGNUP_STATE --preview
 # Secrets
 npx wrangler secret put MAILCHIMP_API_KEY
 npx wrangler secret put TURNSTILE_SECRET
-npx wrangler secret put ALERT_WEBHOOK_URL   # Teams webhook URL (see below)
+npx wrangler secret put ALERT_WEBHOOK_URL    # ops / breaker alerts
+npx wrangler secret put DIGEST_WEBHOOK_URL   # daily disposable digest (separate chat)
 ```
 
 ## Alerts → Microsoft Teams
 
-The Worker POSTs an **Adaptive Card** JSON body (plus a top-level `text` field) to `ALERT_WEBHOOK_URL` when the circuit breaker trips, Mailchimp config errors spike, or a Turnstile failure wave is detected. Classic Office connectors are retired — use **Workflows**.
+Use **two Workflows** if digests should stay out of the ops channel:
 
-Templates that **Post card in a chat or channel** require `type: "AdaptiveCard"` in the body; a bare `{ "text": "…" }` fails with `Property 'type' must be 'AdaptiveCard'`.
+| Secret | Purpose | Suggested destination |
+|---|---|---|
+| `ALERT_WEBHOOK_URL` | Breaker, Mailchimp config, Turnstile wave | Ops / on-call channel |
+| `DIGEST_WEBHOOK_URL` | Daily disposable-domain % digest | Separate channel or group chat |
 
-### 1. Create the webhook in Teams
+If `DIGEST_WEBHOOK_URL` is unset, the digest falls back to `ALERT_WEBHOOK_URL`.
 
-1. Open the **team/channel** that should get signup alerts (e.g. a private ops channel).
-2. Next to the channel name, open **⋯ → Workflows**.
-3. Prefer the template **“Send webhook alerts to a channel”** (or create from blank with trigger **“When a Teams webhook request is received”**).
-4. Set **Who can trigger the flow** to **Anyone** (required so the Worker can POST without a user OAuth token).
-5. Confirm the flow posts to the channel you want → **Save**.
-6. Copy the **HTTP POST URL** the workflow shows after save.
+The Worker POSTs an **Adaptive Card** (`type: "AdaptiveCard"`). Classic Office connectors are retired — use **Workflows**.
 
-If the template’s **Post card** step fails, either keep our Adaptive Card payload (default), or switch that step to **Post message in a chat or channel** and set the message to `triggerBody()?['text']`.
+### 1. Create each webhook in Teams
 
-### 2. Store it on the Worker
+For **each** destination:
+
+1. Open that **channel** (create a dedicated one for digests if you like).
+2. **⋯ → Workflows**.
+3. Template **“Send webhook alerts to a channel”** (or blank + **When a Teams webhook request is received**).
+4. **Who can trigger** → **Anyone**.
+5. Point **Post card** at the right team/channel → **Save**.
+6. Copy the **HTTP POST URL**.
+
+### 2. Store secrets on the Worker
 
 ```bash
 cd signup-worker
 npx wrangler secret put ALERT_WEBHOOK_URL
-# paste the Teams webhook URL when prompted (do not commit it)
+# paste the ops webhook URL
+
+npx wrangler secret put DIGEST_WEBHOOK_URL
+# paste the digest webhook URL
 ```
 
-### 3. Verify the webhook (before relying on the breaker)
-
-Paste your URL into this curl (does not touch Mailchimp or the Worker):
+### 3. Verify a webhook (Adaptive Card curl)
 
 ```bash
 URL='PASTE_TEAMS_WEBHOOK_URL'
@@ -66,16 +75,15 @@ curl -sS -g -X POST "$URL" \
     "type":"AdaptiveCard",
     "$schema":"http://adaptivecards.io/schemas/adaptive-card.json",
     "version":"1.4",
-    "body":[{"type":"TextBlock","text":"SaskToday signup worker test alert — ignore.","wrap":true}],
-    "text":"SaskToday signup worker test alert — ignore."
+    "body":[{"type":"TextBlock","text":"SaskToday signup worker test alert — ignore.","wrap":true}]
   }'
 ```
 
-You should see that card in the channel within a few seconds (HTTP **202**). If you get **401/403**, the flow is not set to **Anyone**.
+You should see that card within a few seconds (HTTP **202**). If you get **401/403**, the flow is not set to **Anyone**.
 
 ### 4. What you’ll see for real trips
 
-Alerts include reason, counts, time, cooldown, and the `wrangler kv key delete` commands to clear `breaker:tripped` / `breaker:alerted`. Only **one** alert fires per trip window (deduped in KV).
+Ops alerts include reason, counts, time, cooldown, and KV reset commands. Only **one** alert fires per trip window (deduped in KV).
 
 Create a Turnstile widget (managed mode) for your site hostnames. Put the **site key** in the front-end (`SASKTODAY_SIGNUP.turnstileSiteKey` or edit `sasktoday-newsletter-inject.js`). Put the **secret** in `TURNSTILE_SECRET`.
 

@@ -3,7 +3,10 @@ export interface Env {
 
   MAILCHIMP_API_KEY: string;
   TURNSTILE_SECRET: string;
+  /** Teams webhook for breaker / config / Turnstile-wave alerts (ops channel) */
   ALERT_WEBHOOK_URL: string;
+  /** Teams webhook for the daily disposable % digest (separate chat/channel) */
+  DIGEST_WEBHOOK_URL?: string;
 
   MAILCHIMP_DC: string;
   ALLOWED_ORIGINS: string;

@@ -1,20 +1,28 @@
 import type { Env } from './env';
 
+export type AlertOptions = {
+  /** Override destination (defaults to ALERT_WEBHOOK_URL). */
+  webhookUrl?: string;
+  /** Adaptive Card title line */
+  title?: string;
+};
+
 /**
- * POST alert JSON to ALERT_WEBHOOK_URL.
+ * POST alert JSON to a Teams Workflows webhook.
  *
- * Teams Workflows templates that use **Post card in a chat or channel**
- * require an Adaptive Card root (`type: "AdaptiveCard"`). Plain `{ text }`
- * fails with: Property 'type' must be 'AdaptiveCard'.
+ * Templates that use **Post card in a chat or channel** require an Adaptive
+ * Card root (`type: "AdaptiveCard"`). Plain `{ text }` fails with:
+ * Property 'type' must be 'AdaptiveCard'.
  *
- * We also include top-level `text` for flows that use **Post message** instead.
- * See README for setup.
+ * - Breaker / config / Turnstile wave → `ALERT_WEBHOOK_URL` (ops channel)
+ * - Daily disposable digest → `DIGEST_WEBHOOK_URL` (separate chat/channel)
  */
 export async function sendAlert(
   env: Env,
-  payload: Record<string, unknown>
+  payload: Record<string, unknown>,
+  opts: AlertOptions = {}
 ): Promise<boolean> {
-  const url = env.ALERT_WEBHOOK_URL;
+  const url = opts.webhookUrl || env.ALERT_WEBHOOK_URL;
   if (!url) {
     console.log(JSON.stringify({ outcome: 'alert_skipped', reason: 'no_webhook' }));
     return false;
@@ -25,7 +33,8 @@ export async function sendAlert(
       ? payload.text
       : `Signup worker alert: ${JSON.stringify(payload)}`;
 
-  // Adaptive Card for Teams "Post card in a chat or channel" (required shape).
+  const title = opts.title || 'SaskToday signup worker';
+
   const body = {
     type: 'AdaptiveCard',
     $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',
@@ -33,7 +42,7 @@ export async function sendAlert(
     body: [
       {
         type: 'TextBlock',
-        text: 'SaskToday signup worker',
+        text: title,
         weight: 'Bolder',
         size: 'Medium',
         wrap: true
@@ -62,12 +71,9 @@ export async function sendAlert(
       );
       return false;
     }
-    console.log(
-      JSON.stringify({ outcome: 'alert_sent', status: res.status })
-    );
+    console.log(JSON.stringify({ outcome: 'alert_sent', status: res.status }));
     return true;
   } catch {
-    // Never fail the request because alerting failed
     console.log(JSON.stringify({ outcome: 'alert_failed' }));
     return false;
   }
@@ -78,13 +84,13 @@ export async function sendAlertOnce(
   env: Env,
   guardKey: string,
   ttlSeconds: number,
-  payload: Record<string, unknown>
+  payload: Record<string, unknown>,
+  opts: AlertOptions = {}
 ): Promise<boolean> {
   const existing = await env.SIGNUP_STATE.get(guardKey);
   if (existing) return false;
-  const ok = await sendAlert(env, payload);
+  const ok = await sendAlert(env, payload, opts);
   if (!ok) return false;
-  // Only dedupe after a successful webhook POST so a bad URL can be retried.
   await env.SIGNUP_STATE.put(guardKey, '1', {
     expirationTtl: Math.max(60, ttlSeconds)
   });
