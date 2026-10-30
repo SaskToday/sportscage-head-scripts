@@ -248,6 +248,11 @@ async function writeManifest(entries) {
 }
 
 async function main() {
+  if (process.env.SKIP_WIDGET_SNAPSHOTS === '1') {
+    console.log('SKIP_WIDGET_SNAPSHOTS=1 — not capturing snapshots');
+    return;
+  }
+
   const opts = parseArgs(process.argv.slice(2));
   if (!CHROME) {
     console.error('No Chrome/Chromium found. Set CHROME_PATH.');

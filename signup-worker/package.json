@@ -5,7 +5,7 @@
   "description": "Mailchimp interest-group signup Worker for SaskToday / SportsCage",
   "scripts": {
     "dev": "npm run sync:widget && wrangler dev",
-    "predeploy": "npm run sync:widget",
+    "predeploy": "npm run sync:widget && npm run snapshot:widgets",
     "deploy": "wrangler deploy",
     "sync:widget": "bash scripts/sync-widget-asset.sh",
     "types": "wrangler types",
@@ -13,7 +13,8 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "refresh:disposable-domains": "python3 scripts/refresh-disposable-domains.py",
-    "snapshot:widgets": "node ./scripts/snapshot-widgets.mjs"
+    "snapshot:widgets": "node ./scripts/snapshot-widgets.mjs",
+    "prepare": "git config core.hooksPath ../.githooks >/dev/null 2>&1 || true"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20251011.0",

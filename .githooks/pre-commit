@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# Auto-capture widget snapshots when the inject script is part of this commit.
+set -euo pipefail
+
+ROOT="$(git rev-parse --show-toplevel)"
+cd "$ROOT"
+
+if ! git diff --cached --name-only | grep -qE '(^|/)sasktoday-newsletter-inject\.js$'; then
+  exit 0
+fi
+
+if [[ "${SKIP_WIDGET_SNAPSHOTS:-}" == "1" ]]; then
+  echo "pre-commit: SKIP_WIDGET_SNAPSHOTS=1 — skipping widget snapshots"
+  exit 0
+fi
+
+if [[ ! -d signup-worker/node_modules/puppeteer-core ]]; then
+  echo "pre-commit: puppeteer-core missing — run: cd signup-worker && npm install --legacy-peer-deps"
+  exit 1
+fi
+
+echo "pre-commit: capturing widget snapshots for inject.js change…"
+(
+  cd signup-worker
+  npm run snapshot:widgets
+)
+
+git add widget-snapshots
+echo "pre-commit: staged updated widget-snapshots/"

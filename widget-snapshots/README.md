@@ -16,18 +16,33 @@ widget-snapshots/
 
 Example: `widget-snapshots/sasktoday/1.0.0+shell-1.4.0/form.png`
 
-## When to capture
+## When snapshots run (automatic)
 
-After you bump a newsletter `version` and/or shell `WIDGET_VERSION`, and before (or with) the deploy commit:
+You do **not** need to run this by hand for normal updates.
+
+| Trigger | What happens |
+|---|---|
+| **git commit** that includes `sasktoday-newsletter-inject.js` | `.githooks/pre-commit` runs snapshots and stages `widget-snapshots/` into that same commit |
+| **`npm run deploy`** (signup-worker) | `predeploy` syncs the CDN asset **and** re-captures snapshots |
+
+First time in a clone, enable hooks (also set by `npm install` via the `prepare` script):
+
+```bash
+git config core.hooksPath .githooks
+cd signup-worker && npm install --legacy-peer-deps
+```
+
+Escape hatch: `SKIP_WIDGET_SNAPSHOTS=1 git commit …` or `SKIP_WIDGET_SNAPSHOTS=1 npm run deploy`.
+
+Manual (optional):
 
 ```bash
 cd signup-worker
 npm run snapshot:widgets
-# or only one newsletter:
 npm run snapshot:widgets -- --only sasktoday
 ```
 
-Commit the new folder(s) under `widget-snapshots/`. Older folders stay forever so you can compare designs over time.
+Older version folders stay forever so you can compare designs over time.
 
 ## Looking up a version
 

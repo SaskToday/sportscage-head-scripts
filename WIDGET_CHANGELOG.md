@@ -22,16 +22,11 @@ Keep both semver (`MAJOR.MINOR.PATCH`). The combined string is capped at 40 char
 1. Change the relevant newsletter entry and/or shared shell code.
 2. Bump **only** what changed (`version` on that newsletter, and/or `WIDGET_VERSION`).
 3. Add a note below.
-4. Capture snapshots (keeps a visual archive you can reopen later):
+4. Commit the inject script — **snapshots run automatically** via `.githooks/pre-commit` and are staged into the same commit under `widget-snapshots/`.
+5. Deploy (`cd signup-worker && npm run deploy`) — **also** re-captures snapshots in `predeploy`, then syncs the CDN asset. Bump the site embed `?v=` whenever the JS file changed so browsers fetch it.
+6. Optionally tag: `git tag widget-vX.Y.Z && git push --tags`.
 
-   ```bash
-   cd signup-worker && npm run snapshot:widgets
-   # or: npm run snapshot:widgets -- --only sasktoday
-   ```
-
-   Writes repo-root `widget-snapshots/<key>/<nl>+shell-<shell>/{form,success}.png` + `config.json`.
-5. Sync + deploy the Worker asset; bump the site embed `?v=` whenever the JS file changed so browsers fetch it.
-6. Commit (include new `widget-snapshots/` folders). Optionally tag: `git tag widget-vX.Y.Z && git push --tags`.
+Manual override if needed: `cd signup-worker && npm run snapshot:widgets`. Skip with `SKIP_WIDGET_SNAPSHOTS=1`.
 
 See [`widget-snapshots/README.md`](widget-snapshots/README.md).
 

@@ -215,14 +215,17 @@ The Worker attaches that string to the Mailchimp Activity event as `widget_versi
 
 History: repo-root [`WIDGET_CHANGELOG.md`](../WIDGET_CHANGELOG.md). Bump the site embed `?v=` to the new shell version when deploying.
 
-After bumping a newsletter or shell version, capture screenshots for the archive:
+Snapshots are **automatic**:
 
-```bash
-npm run snapshot:widgets
-# npm run snapshot:widgets -- --only sasktoday
-```
+- Committing `sasktoday-newsletter-inject.js` → git pre-commit captures + stages `widget-snapshots/`
+- `npm run deploy` → `predeploy` syncs the asset and re-captures snapshots
 
-Output lands in repo-root [`widget-snapshots/`](../widget-snapshots/) (`form.png`, `success.png`, `config.json` per version).
+One-time per clone: `git config core.hooksPath .githooks` (also applied by `npm install` via `prepare`).
+
+Manual: `npm run snapshot:widgets` or `npm run snapshot:widgets -- --only sasktoday`.  
+Skip: `SKIP_WIDGET_SNAPSHOTS=1`.
+
+Archive path: [`widget-snapshots/`](../widget-snapshots/).
 
 ## Interest keys
 
