@@ -140,7 +140,7 @@ Verified signups (past Turnstile + rate limits) are checked against a snapshot o
 - Set `disposableHit: true` on the success log line
 - Increment KV `count:disposable:YYYYMMDDHH` (kept ~3 days, same as signup counters)
 
-**Daily Teams digest** (cron `10 6 * * *` UTC ≈ end of day America/Edmonton): previous local calendar day’s disposable matches as a **percentage of verified signups**. Example:
+**Daily Teams digest** (cron `10 6 * * *` UTC ≈ end of day America/Edmonton): previous local calendar day’s disposable matches as a **percentage of verified signups**, posted to `DIGEST_WEBHOOK_URL`. Example:
 
 ```
 SaskToday signup digest (2026-10-30 America/Edmonton)

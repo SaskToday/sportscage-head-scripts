@@ -344,6 +344,21 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
 
+    // Ops: fire yesterday's disposable digest to DIGEST_WEBHOOK_URL (or ALERT fallback).
+    // Gated by KV token ops:run_digest_token — set only while testing, then delete.
+    if (url.pathname === '/ops/run-digest' && request.method === 'POST') {
+      const expected = await env.SIGNUP_STATE.get('ops:run_digest_token');
+      const provided = request.headers.get('x-ops-token') || '';
+      if (!expected || provided !== expected) {
+        return new Response('Forbidden', { status: 403 });
+      }
+      const result = await sendDisposableDailyDigest(env);
+      return new Response(JSON.stringify(result), {
+        status: 200,
+        headers: { 'content-type': 'application/json; charset=utf-8' }
+      });
+    }
+
     if (url.pathname !== '/subscribe') {
       return new Response('Not found', { status: 404 });
     }
