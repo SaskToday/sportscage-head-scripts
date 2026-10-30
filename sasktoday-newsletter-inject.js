@@ -9,7 +9,7 @@
  */
 (function () {
   // Bump when shipping widget changes; add a note in WIDGET_CHANGELOG.md
-  var WIDGET_VERSION = '1.3.5';
+  var WIDGET_VERSION = '1.3.6';
 
   // ---------------------------------------------------------------------------
   // DEPLOY CONFIG — set after Worker + Turnstile are live
@@ -425,11 +425,13 @@
       '.st-tl-card .st-nl-success__back:hover {' +
       '  background: var(--ink) !important; color: #fff !important; border-color: var(--ink) !important;' +
       '}' +
-      '.st-tl-card .st-nl-success__back:focus { outline: none; }' +
-      '.st-tl-card .st-nl-success__back:focus-visible {' +
-      '  outline: 2px solid var(--accent); outline-offset: 2px;' +
-      '  border-color: var(--ink) !important; box-shadow: none !important;' +
+      /* No focus ring on Back — host themes / programmatic focus were painting a green outline. */ +
+      '.st-tl-card .st-nl-success__back:focus,' +
+      '.st-tl-card .st-nl-success__back:focus-visible,' +
+      '.st-tl-card .st-nl-success__back:active {' +
+      '  outline: none !important; border-color: var(--ink) !important; box-shadow: none !important;' +
       '}' +
+      '.st-tl-card .st-nl-success__title:focus { outline: none; }' +
       '.st-tl-card__legal { margin: 2px 0 0; font-size: 11px; line-height: 1.5; color: var(--muted); }' +
       '</style>' +
       '<div class="st-tl-wrap">' +
@@ -495,7 +497,7 @@
       '        <path class="st-nl-success__check-mark" d="M14.1 27.2l7.1 7.2 16.7-16.8"></path>' +
       '      </svg>' +
       '    </div>' +
-      '    <h2 class="st-nl-success__title">You\'re all set</h2>' +
+      '    <h2 class="st-nl-success__title" tabindex="-1">You\'re all set</h2>' +
       '    <p class="st-nl-success__message" role="status"></p>' +
       '    <button type="button" class="st-nl-success__back">← Back to signup</button>' +
       '  </div>' +
@@ -549,6 +551,7 @@
     var successPanel = root.querySelector('.st-nl-success');
     var successMessage = root.querySelector('.st-nl-success__message');
     var successBack = root.querySelector('.st-nl-success__back');
+    var successTitle = root.querySelector('.st-nl-success__title');
     var successCheck = root.querySelector('.st-nl-success__check');
     var whiskerEl = root.querySelector('.st-tl-card__whisker');
     var headlineEl = root.querySelector('.st-tl-card__headline');
@@ -587,7 +590,10 @@
       if (signupPanel) signupPanel.hidden = true;
       if (successPanel) successPanel.hidden = false;
       replaySuccessCheck();
-      if (successBack) successBack.focus();
+      // Focus the title (not Back) so we don't paint a focus ring on the button.
+      if (successTitle && typeof successTitle.focus === 'function') {
+        successTitle.focus({ preventScroll: true });
+      }
     }
 
     function readTurnstileToken() {
