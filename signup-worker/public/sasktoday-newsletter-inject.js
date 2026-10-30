@@ -425,7 +425,7 @@
       '.st-tl-card .st-nl-success__back:hover {' +
       '  background: var(--ink) !important; color: #fff !important; border-color: var(--ink) !important;' +
       '}' +
-      '.st-tl-card .st-nl-success__back:focus,' +
+      '.st-tl-card .st-nl-success__back:focus { outline: none; }' +
       '.st-tl-card .st-nl-success__back:focus-visible {' +
       '  outline: 2px solid var(--accent); outline-offset: 2px;' +
       '  border-color: var(--ink) !important; box-shadow: none !important;' +
