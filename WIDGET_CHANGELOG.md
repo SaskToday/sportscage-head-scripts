@@ -13,6 +13,10 @@ Use the tag / commit SHA later if you need to check out exactly that UI.
 
 ## Version history
 
+### 1.3.5 — 2026-10-30
+
+- Success screen: hide main headline, style “You’re all set” as the headline, animated green checkmark, restyle Back button (no host blue border/focus ring)
+
 ### 1.3.4 — 2026-10-30
 
 - In-progress signup shows a spinner inside the Sign me up button instead of “Verifying…” / “Submitting…” status text

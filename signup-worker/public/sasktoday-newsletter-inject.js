@@ -9,7 +9,7 @@
  */
 (function () {
   // Bump when shipping widget changes; add a note in WIDGET_CHANGELOG.md
-  var WIDGET_VERSION = '1.3.4';
+  var WIDGET_VERSION = '1.3.5';
 
   // ---------------------------------------------------------------------------
   // DEPLOY CONFIG — set after Worker + Turnstile are live
@@ -382,16 +382,54 @@
       '.st-tl-card .st-nl-choices__error, .st-tl-card .st-nl-status.is-error { color: var(--danger); }' +
       '.st-tl-card .st-nl-status.is-ok { color: var(--accent-hover); }' +
       '.st-tl-card .st-nl-turnstile { min-height: 0; }' +
-      '.st-tl-card .st-nl-success { display: flex; flex-direction: column; gap: 14px; }' +
-      '.st-tl-card .st-nl-success[hidden], .st-tl-card .st-nl-signup[hidden] { display: none !important; }' +
-      '.st-tl-card .st-nl-success__title { margin: 0; font-family: var(--serif); font-weight: 400; font-size: 22px; line-height: 1.15; color: var(--ink); }' +
+      '.st-tl-card .st-nl-success { display: flex; flex-direction: column; gap: 14px; align-items: stretch; }' +
+      '.st-tl-card .st-nl-success[hidden], .st-tl-card .st-nl-signup[hidden],' +
+      '.st-tl-card .st-tl-card__whisker[hidden], .st-tl-card .st-tl-card__headline[hidden] { display: none !important; }' +
+      '.st-tl-card .st-nl-success__check {' +
+      '  width: 56px; height: 56px; margin: 0 0 2px; color: var(--accent);' +
+      '}' +
+      '.st-tl-card .st-nl-success__check svg { display: block; width: 100%; height: 100%; }' +
+      '.st-tl-card .st-nl-success__check-circle,' +
+      '.st-tl-card .st-nl-success__check-mark {' +
+      '  fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round;' +
+      '}' +
+      '.st-tl-card .st-nl-success__check-circle {' +
+      '  stroke-dasharray: 166; stroke-dashoffset: 166;' +
+      '}' +
+      '.st-tl-card .st-nl-success__check-mark {' +
+      '  stroke-dasharray: 48; stroke-dashoffset: 48;' +
+      '}' +
+      '.st-tl-card .st-nl-success__check.is-animating .st-nl-success__check-circle {' +
+      '  animation: st-nl-check-circle 0.55s cubic-bezier(0.65, 0, 0.45, 1) forwards;' +
+      '}' +
+      '.st-tl-card .st-nl-success__check.is-animating .st-nl-success__check-mark {' +
+      '  animation: st-nl-check-mark 0.35s cubic-bezier(0.65, 0, 0.45, 1) 0.4s forwards;' +
+      '}' +
+      '@keyframes st-nl-check-circle { to { stroke-dashoffset: 0; } }' +
+      '@keyframes st-nl-check-mark { to { stroke-dashoffset: 0; } }' +
+      '.st-tl-card .st-nl-success__title {' +
+      '  margin: 0; font-family: var(--serif) !important; font-weight: 400; font-size: 32px;' +
+      '  line-height: 1.08; color: var(--ink);' +
+      '}' +
+      '@media (max-width: 639px) {' +
+      '  .st-tl-card .st-nl-success__title { font-size: 24px !important; }' +
+      '}' +
       '.st-tl-card .st-nl-success__message { margin: 0; font-size: 14px; line-height: 1.45; color: var(--ink-soft); }' +
       '.st-tl-card .st-nl-success__back {' +
-      '  -webkit-appearance: none; appearance: none; height: 48px; width: 100%; background: transparent; color: var(--ink);' +
-      '  border: 2px solid var(--ink); border-radius: 3px; font-family: var(--sans); font-weight: 700; font-size: 13px;' +
+      '  -webkit-appearance: none !important; appearance: none !important;' +
+      '  height: 48px; width: 100%; background: transparent !important; color: var(--ink) !important;' +
+      '  border: 2px solid var(--ink) !important; border-radius: 3px; box-shadow: none !important;' +
+      '  outline: none; font-family: var(--sans); font-weight: 700; font-size: 13px;' +
       '  letter-spacing: 0.22em; text-transform: uppercase; cursor: pointer;' +
       '}' +
-      '.st-tl-card .st-nl-success__back:hover { background: var(--ink); color: #fff; }' +
+      '.st-tl-card .st-nl-success__back:hover {' +
+      '  background: var(--ink) !important; color: #fff !important; border-color: var(--ink) !important;' +
+      '}' +
+      '.st-tl-card .st-nl-success__back:focus,' +
+      '.st-tl-card .st-nl-success__back:focus-visible {' +
+      '  outline: 2px solid var(--accent); outline-offset: 2px;' +
+      '  border-color: var(--ink) !important; box-shadow: none !important;' +
+      '}' +
       '.st-tl-card__legal { margin: 2px 0 0; font-size: 11px; line-height: 1.5; color: var(--muted); }' +
       '</style>' +
       '<div class="st-tl-wrap">' +
@@ -451,7 +489,13 @@
       '  </form>' +
       '  </div>' +
       '  <div class="st-nl-success" hidden>' +
-      '    <p class="st-nl-success__title">You\'re all set</p>' +
+      '    <div class="st-nl-success__check" aria-hidden="true">' +
+      '      <svg viewBox="0 0 52 52" focusable="false">' +
+      '        <circle class="st-nl-success__check-circle" cx="26" cy="26" r="24"></circle>' +
+      '        <path class="st-nl-success__check-mark" d="M14.1 27.2l7.1 7.2 16.7-16.8"></path>' +
+      '      </svg>' +
+      '    </div>' +
+      '    <h2 class="st-nl-success__title">You\'re all set</h2>' +
       '    <p class="st-nl-success__message" role="status"></p>' +
       '    <button type="button" class="st-nl-success__back">← Back to signup</button>' +
       '  </div>' +
@@ -505,6 +549,9 @@
     var successPanel = root.querySelector('.st-nl-success');
     var successMessage = root.querySelector('.st-nl-success__message');
     var successBack = root.querySelector('.st-nl-success__back');
+    var successCheck = root.querySelector('.st-nl-success__check');
+    var whiskerEl = root.querySelector('.st-tl-card__whisker');
+    var headlineEl = root.querySelector('.st-tl-card__headline');
     var statusEl = root.querySelector('.st-nl-status');
     var submitBtn = root.querySelector('.st-nl-submit');
     var turnstileHost = root.querySelector('.st-nl-turnstile');
@@ -513,9 +560,20 @@
     var turnstileMountPromise = null;
     var TURNSTILE_WAIT_MS = 15000;
 
+    function replaySuccessCheck() {
+      if (!successCheck) return;
+      successCheck.classList.remove('is-animating');
+      // Force reflow so the draw animation restarts each success.
+      void successCheck.offsetWidth;
+      successCheck.classList.add('is-animating');
+    }
+
     function showSignup() {
+      if (whiskerEl) whiskerEl.hidden = false;
+      if (headlineEl) headlineEl.hidden = false;
       if (signupPanel) signupPanel.hidden = false;
       if (successPanel) successPanel.hidden = true;
+      if (successCheck) successCheck.classList.remove('is-animating');
       if (successMessage) successMessage.textContent = '';
       setStatus(statusEl, '', null);
     }
@@ -524,8 +582,11 @@
       if (successMessage) {
         successMessage.textContent = message || SUCCESS_FALLBACK;
       }
+      if (whiskerEl) whiskerEl.hidden = true;
+      if (headlineEl) headlineEl.hidden = true;
       if (signupPanel) signupPanel.hidden = true;
       if (successPanel) successPanel.hidden = false;
+      replaySuccessCheck();
       if (successBack) successBack.focus();
     }
 
