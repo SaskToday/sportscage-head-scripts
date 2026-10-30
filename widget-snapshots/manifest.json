@@ -1,0 +1,187 @@
+{
+  "updatedAt": "2026-10-30T19:42:03.925Z",
+  "snapshots": [
+    {
+      "key": "crime-cops-court",
+      "newsletterVersion": "1.0.0",
+      "shellVersion": "1.4.0",
+      "widgetVersion": "crime-cops-court@1.0.0+1.4.0",
+      "path": "widget-snapshots/crime-cops-court/1.0.0+shell-1.4.0",
+      "files": [
+        "form.png",
+        "success.png",
+        "config.json"
+      ],
+      "updatedAt": "2026-10-30T19:30:53.461Z"
+    },
+    {
+      "key": "crime-cops-court",
+      "newsletterVersion": "1.0.0",
+      "shellVersion": "1.4.1",
+      "widgetVersion": "crime-cops-court@1.0.0+1.4.1",
+      "path": "widget-snapshots/crime-cops-court/1.0.0+shell-1.4.1",
+      "files": [
+        "form.png",
+        "success.png",
+        "config.json"
+      ],
+      "updatedAt": "2026-10-30T19:42:03.920Z"
+    },
+    {
+      "key": "estevan-today",
+      "newsletterVersion": "1.0.0",
+      "shellVersion": "1.4.0",
+      "widgetVersion": "estevan-today@1.0.0+1.4.0",
+      "path": "widget-snapshots/estevan-today/1.0.0+shell-1.4.0",
+      "files": [
+        "form.png",
+        "success.png",
+        "config.json"
+      ],
+      "updatedAt": "2026-10-30T19:30:53.461Z"
+    },
+    {
+      "key": "estevan-today",
+      "newsletterVersion": "1.0.0",
+      "shellVersion": "1.4.1",
+      "widgetVersion": "estevan-today@1.0.0+1.4.1",
+      "path": "widget-snapshots/estevan-today/1.0.0+shell-1.4.1",
+      "files": [
+        "form.png",
+        "success.png",
+        "config.json"
+      ],
+      "updatedAt": "2026-10-30T19:42:03.920Z"
+    },
+    {
+      "key": "regina-today",
+      "newsletterVersion": "1.0.0",
+      "shellVersion": "1.4.0",
+      "widgetVersion": "regina-today@1.0.0+1.4.0",
+      "path": "widget-snapshots/regina-today/1.0.0+shell-1.4.0",
+      "files": [
+        "form.png",
+        "success.png",
+        "config.json"
+      ],
+      "updatedAt": "2026-10-30T19:30:53.461Z"
+    },
+    {
+      "key": "regina-today",
+      "newsletterVersion": "1.0.0",
+      "shellVersion": "1.4.1",
+      "widgetVersion": "regina-today@1.0.0+1.4.1",
+      "path": "widget-snapshots/regina-today/1.0.0+shell-1.4.1",
+      "files": [
+        "form.png",
+        "success.png",
+        "config.json"
+      ],
+      "updatedAt": "2026-10-30T19:42:03.920Z"
+    },
+    {
+      "key": "saskag-today",
+      "newsletterVersion": "1.0.0",
+      "shellVersion": "1.4.0",
+      "widgetVersion": "saskag-today@1.0.0+1.4.0",
+      "path": "widget-snapshots/saskag-today/1.0.0+shell-1.4.0",
+      "files": [
+        "form.png",
+        "success.png",
+        "config.json"
+      ],
+      "updatedAt": "2026-10-30T19:30:53.461Z"
+    },
+    {
+      "key": "saskag-today",
+      "newsletterVersion": "1.0.0",
+      "shellVersion": "1.4.1",
+      "widgetVersion": "saskag-today@1.0.0+1.4.1",
+      "path": "widget-snapshots/saskag-today/1.0.0+shell-1.4.1",
+      "files": [
+        "form.png",
+        "success.png",
+        "config.json"
+      ],
+      "updatedAt": "2026-10-30T19:42:03.920Z"
+    },
+    {
+      "key": "saskatoon-today",
+      "newsletterVersion": "1.0.0",
+      "shellVersion": "1.4.0",
+      "widgetVersion": "saskatoon-today@1.0.0+1.4.0",
+      "path": "widget-snapshots/saskatoon-today/1.0.0+shell-1.4.0",
+      "files": [
+        "form.png",
+        "success.png",
+        "config.json"
+      ],
+      "updatedAt": "2026-10-30T19:30:53.461Z"
+    },
+    {
+      "key": "saskatoon-today",
+      "newsletterVersion": "1.0.0",
+      "shellVersion": "1.4.1",
+      "widgetVersion": "saskatoon-today@1.0.0+1.4.1",
+      "path": "widget-snapshots/saskatoon-today/1.0.0+shell-1.4.1",
+      "files": [
+        "form.png",
+        "success.png",
+        "config.json"
+      ],
+      "updatedAt": "2026-10-30T19:42:03.920Z"
+    },
+    {
+      "key": "sasktoday",
+      "newsletterVersion": "1.0.0",
+      "shellVersion": "1.4.0",
+      "widgetVersion": "sasktoday@1.0.0+1.4.0",
+      "path": "widget-snapshots/sasktoday/1.0.0+shell-1.4.0",
+      "files": [
+        "form.png",
+        "success.png",
+        "config.json"
+      ],
+      "updatedAt": "2026-10-30T19:30:53.461Z"
+    },
+    {
+      "key": "sasktoday",
+      "newsletterVersion": "1.0.1",
+      "shellVersion": "1.4.1",
+      "widgetVersion": "sasktoday@1.0.1+1.4.1",
+      "path": "widget-snapshots/sasktoday/1.0.1+shell-1.4.1",
+      "files": [
+        "form.png",
+        "success.png",
+        "config.json"
+      ],
+      "updatedAt": "2026-10-30T19:42:03.920Z"
+    },
+    {
+      "key": "sportscage",
+      "newsletterVersion": "1.0.0",
+      "shellVersion": "1.4.0",
+      "widgetVersion": "sportscage@1.0.0+1.4.0",
+      "path": "widget-snapshots/sportscage/1.0.0+shell-1.4.0",
+      "files": [
+        "form.png",
+        "success.png",
+        "config.json"
+      ],
+      "updatedAt": "2026-10-30T19:30:53.461Z"
+    },
+    {
+      "key": "sportscage",
+      "newsletterVersion": "1.0.0",
+      "shellVersion": "1.4.1",
+      "widgetVersion": "sportscage@1.0.0+1.4.1",
+      "path": "widget-snapshots/sportscage/1.0.0+shell-1.4.1",
+      "files": [
+        "form.png",
+        "success.png",
+        "config.json"
+      ],
+      "updatedAt": "2026-10-30T19:42:03.920Z"
+    }
+  ]
+}

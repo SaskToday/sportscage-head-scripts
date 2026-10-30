@@ -1,0 +1,77 @@
+:root {
+  --ink: #101a14;
+  --green: #016a1b;
+  --bg: #f3f6f3;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: "Source Sans 3", system-ui, sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(ellipse 70% 45% at 0% 0%, rgba(1, 106, 27, 0.1), transparent 55%),
+    var(--bg);
+  min-height: 100vh;
+}
+.preview-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: #fff;
+  border-bottom: 2px solid var(--ink);
+  font-size: 14px;
+}
+.preview-bar a {
+  color: var(--green);
+  font-weight: 600;
+  text-decoration: none;
+}
+.preview-bar a:hover { text-decoration: underline; }
+.preview-bar strong {
+  display: block;
+  font-family: Montserrat, sans-serif;
+  font-weight: 900;
+  font-size: 15px;
+}
+.preview-bar span {
+  color: rgba(16, 26, 20, 0.6);
+  font-size: 12px;
+}
+.preview-bar__hint {
+  font-size: 12px !important;
+  color: rgba(16, 26, 20, 0.55) !important;
+}
+.preview-stage {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 24px 20px 64px;
+}
+/* Kill the card's top margin in previews so it sits cleanly in the stage */
+.preview-stage .st-signup-card,
+.preview-stage .st-tl-card { margin-top: 0; }
+
+/*
+ * Simulate hostile host-template legend styles (SaskToday-like) so we can
+ * verify the widget's legend resets. The inject CSS must win over these.
+ */
+legend {
+  border-bottom: 1px solid #ccc;
+  text-decoration: underline;
+  padding-bottom: 6px;
+  width: 100%;
+}
+legend::after {
+  content: "";
+  display: block;
+  border-bottom: 2px solid #016a1b;
+  margin-top: 4px;
+}
+
+/* Narrow host slot to confirm green accent shadow stays inside */
+.preview-stage {
+  outline: 1px dashed rgba(1, 106, 27, 0.35);
+  overflow: hidden;
+}

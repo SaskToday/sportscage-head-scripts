@@ -1,0 +1,20 @@
+{
+  "capturedAt": "2026-10-30T19:30:53.461Z",
+  "key": "crime-cops-court",
+  "newsletterVersion": "1.0.0",
+  "shellVersion": "1.4.0",
+  "widgetVersion": "crime-cops-court@1.0.0+1.4.0",
+  "preview": "previews/crime-cops-court.html",
+  "config": {
+    "version": "1.0.0",
+    "layout": "tagline-lead",
+    "accent": "#016a1b",
+    "whisker": "Crime, Cops & Court Newsletter",
+    "headlineBefore": "",
+    "headlineAccent": "Sask Crime",
+    "headlineAfter": " evolves quickly. We'll keep you in the loop.",
+    "body": "Get the latest crime updates from around Sask in our Crime, Cops & Court Report. Delivered 5-days a week to your inbox, Monday - Friday.",
+    "legalBrand": "SaskToday",
+    "interestKey": "crime-cops-court-daily"
+  }
+}

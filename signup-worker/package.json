@@ -1,0 +1,27 @@
+{
+  "name": "signup-worker",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Mailchimp interest-group signup Worker for SaskToday / SportsCage",
+  "scripts": {
+    "dev": "npm run sync:widget && wrangler dev",
+    "predeploy": "npm run sync:widget && npm run snapshot:widgets",
+    "deploy": "wrangler deploy",
+    "sync:widget": "bash scripts/sync-widget-asset.sh",
+    "types": "wrangler types",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "refresh:disposable-domains": "python3 scripts/refresh-disposable-domains.py",
+    "snapshot:widgets": "node ./scripts/snapshot-widgets.mjs",
+    "prepare": "git config core.hooksPath ../.githooks >/dev/null 2>&1 || true"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20251011.0",
+    "puppeteer-core": "^24.22.0",
+    "typescript": "^5.9.3",
+    "vite": "^8.3.5",
+    "vitest": "^3.2.4",
+    "wrangler": "^4.42.2"
+  }
+}

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SaskToday newsletter widget previews</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;900&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #101a14;
+      --green: #016a1b;
+      --bg: #f3f6f3;
+      --line: rgba(16, 26, 20, 0.12);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Source Sans 3", system-ui, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse 80% 50% at 10% -10%, rgba(1, 106, 27, 0.12), transparent 55%),
+        radial-gradient(ellipse 60% 40% at 100% 0%, rgba(1, 106, 27, 0.08), transparent 50%),
+        var(--bg);
+      min-height: 100vh;
+    }
+    .wrap {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 40px 20px 80px;
+    }
+    header h1 {
+      font-family: Montserrat, sans-serif;
+      font-weight: 900;
+      font-size: clamp(28px, 5vw, 40px);
+      margin: 0 0 8px;
+      letter-spacing: -0.03em;
+    }
+    header h1 span { color: var(--green); }
+    header p {
+      margin: 0 0 28px;
+      color: rgba(16, 26, 20, 0.7);
+      line-height: 1.5;
+      max-width: 40rem;
+    }
+    .note {
+      border: 1px solid var(--line);
+      background: #fff;
+      padding: 14px 16px;
+      margin-bottom: 28px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .note code {
+      font-size: 12px;
+      background: rgba(1, 106, 27, 0.08);
+      padding: 1px 5px;
+    }
+    .grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    a.card {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      background: #fff;
+      border: 2px solid var(--ink);
+      box-shadow: 4px 4px 0 0 var(--green);
+      padding: 16px 18px;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    a.card:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 6px 6px 0 0 var(--green);
+    }
+    a.card.disabled {
+      opacity: 0.45;
+      pointer-events: none;
+      box-shadow: none;
+    }
+    .card__title {
+      font-family: Montserrat, sans-serif;
+      font-weight: 900;
+      font-size: 18px;
+      margin: 0 0 4px;
+    }
+    .card__title .g { color: var(--green); }
+    .card__meta {
+      margin: 0;
+      font-size: 13px;
+      color: rgba(16, 26, 20, 0.65);
+      line-height: 1.45;
+    }
+    .badge {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--green);
+    }
+    .badge.warn { color: #9a3412; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1><span>Sask</span>Today newsletter previews</h1>
+      <p>
+        Open each page to review design and submit a real Mailchimp test signup.
+        Forms open Mailchimp in a new tab on submit.
+      </p>
+    </header>
+
+    <div class="note">
+      YorktonToday is listed but disabled until you provide its embed.
+      SportsCage uses the existing Insider Report list/group from the SportsCage site script.
+    </div>
+
+    <div class="grid">
+      <a class="card" href="regina-today.html">
+        <p class="card__title"><span class="g">Regina</span>Today</p>
+        <p class="card__meta">/regina-today/* · /southwest/regina-news/*</p>
+      </a>
+      <a class="card" href="saskatoon-today.html">
+        <p class="card__title"><span class="g">Saskatoon</span>Today</p>
+        <p class="card__meta">/saskatoon-today/* · /north/saskatoon/*</p>
+      </a>
+      <a class="card" href="estevan-today.html">
+        <p class="card__title"><span class="g">Estevan</span>Today</p>
+        <p class="card__meta">/estevan-today/* · /southeast/estevan-mercury/* · /southeast/estevanmercury/*</p>
+      </a>
+      <a class="card disabled" href="#">
+        <p class="card__title"><span class="g">Yorkton</span>Today</p>
+        <p class="card__meta">/yorkton-today/* · /central/yorkton-this-week/* · /central/yorktonthisweek/*</p>
+        <span class="badge warn">Waiting on embed</span>
+      </a>
+      <a class="card" href="sasktoday.html">
+        <p class="card__title"><span class="g">Sask</span>Today</p>
+        <p class="card__meta">Default / all other paths — Daily &amp; Weekly choices</p>
+        <span class="badge">Shows frequency options</span>
+      </a>
+      <a class="card" href="saskag-today.html">
+        <p class="card__title">SaskAgToday</p>
+        <p class="card__meta">/agriculture/*</p>
+      </a>
+      <a class="card" href="sportscage.html">
+        <p class="card__title">SportsCage</p>
+        <p class="card__meta">/sports/* — Harvard Media Insider list</p>
+      </a>
+      <a class="card" href="crime-cops-court.html">
+        <p class="card__title">Crime, Cops &amp; Court</p>
+        <p class="card__meta">/crime-cops-court/*</p>
+      </a>
+      <a class="card" href="gallery.html">
+        <p class="card__title">All widgets gallery</p>
+        <p class="card__meta">Every available variant on one page for side-by-side design review</p>
+      </a>
+    </div>
+  </div>
+</body>
+</html>
