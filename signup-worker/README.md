@@ -154,6 +154,13 @@ Observe-only — matches are not blocked.
 npx wrangler kv key get --binding SIGNUP_STATE --remote --preview false \
   "count:disposable:$(date -u +%Y%m%d%H)"
 
+# Manually fire the digest (optional test): put a short-lived KV token, POST, delete token
+npx wrangler kv key put --binding SIGNUP_STATE --remote --preview false \
+  ops:run_digest_token 'YOUR_TEMP_TOKEN' --ttl 600
+curl -sS -X POST https://sasktoday-signup.nmorrison.workers.dev/ops/run-digest \
+  -H 'x-ops-token: YOUR_TEMP_TOKEN'
+npx wrangler kv key delete --binding SIGNUP_STATE --remote --preview false ops:run_digest_token
+
 # Refresh the bundled domain snapshot, then redeploy
 npm run refresh:disposable-domains
 npm run deploy
