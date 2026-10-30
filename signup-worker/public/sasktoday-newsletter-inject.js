@@ -9,7 +9,7 @@
  */
 (function () {
   // Bump when shipping widget changes; add a note in WIDGET_CHANGELOG.md
-  var WIDGET_VERSION = '1.3.3';
+  var WIDGET_VERSION = '1.3.4';
 
   // ---------------------------------------------------------------------------
   // DEPLOY CONFIG — set after Worker + Turnstile are live
@@ -336,12 +336,25 @@
       '.st-tl-card input[type="email"]:focus { border-bottom-color: var(--accent); }' +
       '.st-tl-card .st-nl-hp { position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden; }' +
       '.st-tl-card .st-nl-submit {' +
-      '  -webkit-appearance: none; appearance: none; height: 48px; width: 100%; background: var(--btn); color: #fff;' +
+      '  -webkit-appearance: none; appearance: none; position: relative;' +
+      '  display: inline-flex; align-items: center; justify-content: center;' +
+      '  height: 48px; width: 100%; background: var(--btn); color: #fff;' +
       '  border: 0; border-radius: 3px; font-family: var(--sans); font-weight: 700; font-size: 13px;' +
       '  letter-spacing: 0.22em; text-transform: uppercase; cursor: pointer;' +
       '}' +
       '.st-tl-card .st-nl-submit:hover { background: var(--accent); }' +
-      '.st-tl-card .st-nl-submit:disabled { opacity: 0.6; cursor: wait; }' +
+      '.st-tl-card .st-nl-submit:disabled:not(.is-busy) { opacity: 0.6; cursor: wait; }' +
+      '.st-tl-card .st-nl-submit.is-busy { cursor: wait; }' +
+      '.st-tl-card .st-nl-submit__label { display: inline-block; }' +
+      '.st-tl-card .st-nl-submit.is-busy .st-nl-submit__label { visibility: hidden; }' +
+      '.st-tl-card .st-nl-submit__spinner {' +
+      '  display: none; box-sizing: border-box; position: absolute; left: 50%; top: 50%;' +
+      '  width: 18px; height: 18px; margin: -9px 0 0 -9px;' +
+      '  border: 2px solid rgba(255,255,255,0.35); border-top-color: #fff; border-radius: 50%;' +
+      '  animation: st-nl-spin 0.7s linear infinite;' +
+      '}' +
+      '.st-tl-card .st-nl-submit.is-busy .st-nl-submit__spinner { display: block; }' +
+      '@keyframes st-nl-spin { to { transform: rotate(360deg); } }' +
       '.st-tl-card .st-nl-choices { border: 0 !important; margin: 0; padding: 0; min-width: 0; }' +
       // Host templates often style bare <legend> with underlines / ::after — reset hard.
       '.st-tl-card .st-nl-choices legend,' +
@@ -431,7 +444,10 @@
       '" role="status" hidden></p>' +
       '    <button type="submit" class="st-nl-submit" id="' +
       submitId +
-      '">Sign me up →</button>' +
+      '" aria-busy="false">' +
+      '<span class="st-nl-submit__label">Sign me up →</span>' +
+      '<span class="st-nl-submit__spinner" aria-hidden="true"></span>' +
+      '</button>' +
       '  </form>' +
       '  </div>' +
       '  <div class="st-nl-success" hidden>' +
@@ -458,6 +474,15 @@
     el.hidden = false;
     el.textContent = message;
     el.className = 'st-nl-status' + (kind ? ' is-' + kind : '');
+  }
+
+  function setSubmitBusy(btn, busy) {
+    if (!btn) return;
+    var on = !!busy;
+    btn.disabled = on;
+    if (on) btn.classList.add('is-busy');
+    else btn.classList.remove('is-busy');
+    btn.setAttribute('aria-busy', on ? 'true' : 'false');
   }
 
   function collectInterests(form, config) {
@@ -648,12 +673,7 @@
       var honeypot = form.querySelector('input[name="hp_field"]');
       var hpField = honeypot ? String(honeypot.value || '') : '';
 
-      if (submitBtn) submitBtn.disabled = true;
-      setStatus(
-        statusEl,
-        SIGNUP.turnstileSiteKey ? 'Verifying…' : 'Submitting…',
-        null
-      );
+      setSubmitBusy(submitBtn, true);
 
       waitForTurnstileToken(TURNSTILE_WAIT_MS)
         .then(function (token) {
@@ -663,11 +683,10 @@
               'Please complete the verification challenge.',
               'error'
             );
-            if (submitBtn) submitBtn.disabled = false;
+            setSubmitBusy(submitBtn, false);
             return null;
           }
 
-          setStatus(statusEl, 'Submitting…', null);
           var payload = {
             email: email,
             interests: interests,
@@ -736,7 +755,7 @@
           }
         })
         .then(function () {
-          if (submitBtn) submitBtn.disabled = false;
+          setSubmitBusy(submitBtn, false);
           if (
             signupPanel &&
             !signupPanel.hidden &&

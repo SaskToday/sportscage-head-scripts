@@ -13,6 +13,10 @@ Use the tag / commit SHA later if you need to check out exactly that UI.
 
 ## Version history
 
+### 1.3.4 — 2026-10-30
+
+- In-progress signup shows a spinner inside the Sign me up button instead of “Verifying…” / “Submitting…” status text
+
 ### 1.3.3 — 2026-10-30
 
 - Fix CSS string concat that turned style selectors into `NaN` (legend reset + wrap padding never applied)
