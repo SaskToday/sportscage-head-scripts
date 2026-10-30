@@ -8,8 +8,11 @@
  * Preview override: data-newsletter on the container, or ?st_newsletter=<key>
  */
 (function () {
-  // Bump when shipping widget changes; add a note in WIDGET_CHANGELOG.md
-  var WIDGET_VERSION = '1.3.6';
+  // Shared shell version (layout chrome, Turnstile, success UX, etc.).
+  // Each NEWSLETTERS entry also has its own `version` for copy/interest changes.
+  // Sent to the API as `{newsletterKey}@{newsletterVersion}+{WIDGET_VERSION}`.
+  // Bump the relevant piece and note it in WIDGET_CHANGELOG.md.
+  var WIDGET_VERSION = '1.4.0';
 
   // ---------------------------------------------------------------------------
   // DEPLOY CONFIG — set after Worker + Turnstile are live
@@ -36,6 +39,7 @@
   // ---------------------------------------------------------------------------
   var NEWSLETTERS = {
     'regina-today': {
+      version: '1.0.0',
       layout: 'tagline-lead',
       accent: '#016a1b',
       whisker: 'ReginaToday Daily Newsletter',
@@ -48,6 +52,7 @@
     },
 
     'saskatoon-today': {
+      version: '1.0.0',
       layout: 'tagline-lead',
       accent: '#016a1b',
       whisker: 'SaskatoonToday Daily Newsletter',
@@ -60,6 +65,7 @@
     },
 
     'estevan-today': {
+      version: '1.0.0',
       layout: 'tagline-lead',
       accent: '#016a1b',
       whisker: 'EstevanToday Daily Newsletter',
@@ -72,9 +78,10 @@
     },
 
     // YorktonToday — embed / interest not ready yet
-    // 'yorkton-today': { ..., interestKey: 'yorktontoday-daily' },
+    // 'yorkton-today': { version: '1.0.0', ..., interestKey: 'yorktontoday-daily' },
 
     sasktoday: {
+      version: '1.0.0',
       layout: 'tagline-lead',
       accent: '#016a1b',
       whisker: 'SaskToday Daily Newsletter',
@@ -91,6 +98,7 @@
     },
 
     'saskag-today': {
+      version: '1.0.0',
       layout: 'tagline-lead',
       accent: '#016a1b',
       whisker: 'SaskAgToday Daily Newsletter',
@@ -104,6 +112,7 @@
     },
 
     sportscage: {
+      version: '1.0.0',
       layout: 'tagline-lead',
       accent: '#016a1b',
       whisker: 'SportsCage Insider Report',
@@ -117,6 +126,7 @@
     },
 
     'crime-cops-court': {
+      version: '1.0.0',
       layout: 'tagline-lead',
       accent: '#016a1b',
       whisker: 'Crime, Cops & Court Newsletter',
@@ -167,6 +177,17 @@
       MAILING_ADDRESS +
       '.'
     );
+  }
+
+  /** Per-newsletter content version + shared shell, for Mailchimp Activity. */
+  function buildWidgetVersion(newsletterKey, config) {
+    var nv =
+      config && typeof config.version === 'string' && config.version
+        ? config.version
+        : '0.0.0';
+    var raw = String(newsletterKey || 'unknown') + '@' + nv + '+' + WIDGET_VERSION;
+    // Worker / Mailchimp property cap
+    return raw.slice(0, 40);
   }
 
   // ---------------------------------------------------------------------------
@@ -759,7 +780,7 @@
             interests: interests,
             turnstileToken: token || '',
             hp_field: hpField,
-            widgetVersion: WIDGET_VERSION
+            widgetVersion: buildWidgetVersion(newsletterKey, config)
           };
           if (interests.length === 1) payload.interest = interests[0];
 
@@ -876,6 +897,7 @@
     PATH_RULES: PATH_RULES,
     SIGNUP: SIGNUP,
     WIDGET_VERSION: WIDGET_VERSION,
+    buildWidgetVersion: buildWidgetVersion,
     resolveNewsletterKey: resolveNewsletterKey,
     renderInto: renderInto,
     inject: inject

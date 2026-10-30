@@ -29,11 +29,14 @@ type SubscribeBody = {
   hp_field?: unknown;
 };
 
-/** Keep versions short and log-safe for Mailchimp event properties. */
+/** Keep versions short and log-safe for Mailchimp event properties.
+ *  Client format: `{newsletterKey}@{newsletterVersion}+{shellVersion}`
+ *  e.g. `sasktoday@1.0.0+1.4.0`
+ */
 function parseWidgetVersion(raw: unknown): string {
   if (typeof raw !== 'string') return 'unknown';
   const v = raw.trim().slice(0, 40);
-  if (!/^[a-zA-Z0-9._+-]+$/.test(v)) return 'unknown';
+  if (!/^[a-zA-Z0-9._@+-]+$/.test(v)) return 'unknown';
   return v || 'unknown';
 }
 

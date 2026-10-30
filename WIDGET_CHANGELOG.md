@@ -1,17 +1,47 @@
 # Newsletter widget versions
 
-The front-end inject script (`sasktoday-newsletter-inject.js`) sends a `widgetVersion` on every signup. The Worker writes that value onto the Mailchimp contact **Activity** event so we can see which widget build a person used.
+The inject script sends a **composite** `widgetVersion` on every signup. The Worker writes it onto the Mailchimp contact **Activity** event (`newsletter_signup` → `widget_version`).
 
-## How to ship a new version
+## Format
 
-1. Make your copy/design/behavior changes in `sasktoday-newsletter-inject.js` (and Worker if needed).
-2. Bump `WIDGET_VERSION` at the top of `sasktoday-newsletter-inject.js` (semver: `MAJOR.MINOR.PATCH`).
-3. Add a section below describing what changed.
-4. Commit. Optionally tag: `git tag widget-v1.2.0 && git push --tags`.
+```
+{newsletterKey}@{newsletterVersion}+{shellVersion}
+```
 
-Use the tag / commit SHA later if you need to check out exactly that UI.
+Example: `sasktoday@1.0.0+1.4.0`
 
-## Version history
+| Piece | Where | When to bump |
+|---|---|---|
+| `newsletterVersion` | `NEWSLETTERS[key].version` | Copy, interests, or layout unique to that newsletter |
+| `shellVersion` (`WIDGET_VERSION`) | Top of `sasktoday-newsletter-inject.js` | Shared chrome: Turnstile, success screen, spinner, CSS shell |
+
+Keep both semver (`MAJOR.MINOR.PATCH`). The combined string is capped at 40 characters for Mailchimp.
+
+## How to ship
+
+1. Change the relevant newsletter entry and/or shared shell code.
+2. Bump **only** what changed (`version` on that newsletter, and/or `WIDGET_VERSION`).
+3. Add a note below.
+4. Sync + deploy the Worker asset; bump the site embed `?v=` to the new shell version so browsers fetch the file.
+5. Commit. Optionally tag: `git tag widget-vX.Y.Z && git push --tags`.
+
+## Newsletter versions (current)
+
+| Key | Version | Notes |
+|---|---|---|
+| `regina-today` | `1.0.0` | Launch copy |
+| `saskatoon-today` | `1.0.0` | Launch copy |
+| `estevan-today` | `1.0.0` | Launch copy |
+| `sasktoday` | `1.0.0` | Launch copy + daily/weekly choices |
+| `saskag-today` | `1.0.0` | Launch copy |
+| `sportscage` | `1.0.0` | Launch copy |
+| `crime-cops-court` | `1.0.0` | Launch copy |
+
+## Shell version history
+
+### 1.4.0 — 2026-10-30
+
+- Per-newsletter `version` fields; API `widgetVersion` is now `{key}@{nl}+{shell}` (was a single global string)
 
 ### 1.3.6 — 2026-10-30
 
@@ -41,22 +71,14 @@ Use the tag / commit SHA later if you need to check out exactly that UI.
 
 ### 1.3.0 — 2026-10-30
 
-- Lazy Turnstile: load/render on viewport/focus/submit (avoided a verification per pageview)
-- Submit waits up to 15s for a token so signup still works if the user hits send immediately
+- Lazy-load Turnstile until the signup form is used
 
 ### 1.2.0 — 2026-10-30
 
-- Turnstile `appearance: 'interaction-only'` (Managed widget) — checkbox only when Cloudflare needs a challenge
+- Success panel (“You’re all set”) after signup
+- Turnstile Managed + `appearance: interaction-only`
 
-### 1.1.0 — 2026-10-30
+### 1.1.x / 1.0.x
 
-- Success uses a dedicated panel (hides the form) with **← Back to signup**
-- New success copy: check inbox / may need to confirm if new subscriber
-
-### 1.0.0 — 2026-10-29
-
-- Tagline-lead card design (Alfa Slab One / Source Sans 3)
-- Posts to Cloudflare signup Worker (not Mailchimp embed)
-- Turnstile + honeypot (`hp_field`)
-- Interest keys for Regina / Saskatoon / Estevan / SaskToday / SaskAg / Crime / SportsCage
+- Initial tagline-lead inject + Worker subscribe path
 - Activity event `newsletter_signup` includes `widget_version`

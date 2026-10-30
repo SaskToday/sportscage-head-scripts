@@ -129,7 +129,7 @@ The inject script is hosted on the same Worker (Cloudflare):
   };
 </script>
 <script
-  src="https://sasktoday-signup.nmorrison.workers.dev/sasktoday-newsletter-inject.js?v=1.3.6"
+  src="https://sasktoday-signup.nmorrison.workers.dev/sasktoday-newsletter-inject.js?v=1.4.0"
   defer
 ></script>
 ```
@@ -198,9 +198,22 @@ npm run typecheck
 
 ## Widget versioning
 
-The inject script defines `WIDGET_VERSION` and sends it on every `/subscribe` call. The Worker attaches `widget_version` to the Mailchimp Activity event `newsletter_signup`.
+Each newsletter has its own `version` in `NEWSLETTERS`, plus a shared shell `WIDGET_VERSION`. Every `/subscribe` call sends a composite:
 
-Keep a human history in repo-root [`WIDGET_CHANGELOG.md`](../WIDGET_CHANGELOG.md). Bump the constant whenever you ship meaningful widget changes; optionally `git tag widget-vX.Y.Z`.
+```
+{newsletterKey}@{newsletterVersion}+{shellVersion}
+```
+
+Example: `sasktoday@1.0.0+1.4.0`
+
+The Worker attaches that string to the Mailchimp Activity event as `widget_version`.
+
+| Change type | Bump |
+|---|---|
+| Copy / interests for one newsletter | that entry’s `version` |
+| Shared UI (spinner, success, Turnstile, CSS shell) | `WIDGET_VERSION` |
+
+History: repo-root [`WIDGET_CHANGELOG.md`](../WIDGET_CHANGELOG.md). Bump the site embed `?v=` to the new shell version when deploying.
 
 ## Interest keys
 
