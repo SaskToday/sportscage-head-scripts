@@ -9,7 +9,7 @@
  */
 (function () {
   // Bump when shipping widget changes; add a note in WIDGET_CHANGELOG.md
-  var WIDGET_VERSION = '1.2.0';
+  var WIDGET_VERSION = '1.3.0';
 
   // ---------------------------------------------------------------------------
   // DEPLOY CONFIG — set after Worker + Turnstile are live
@@ -224,14 +224,18 @@
     }
     var existing = document.getElementById('st-nl-turnstile');
     if (existing) {
-      existing.addEventListener('load', cb);
+      existing.addEventListener('load', function () {
+        cb();
+      });
       return;
     }
     var s = document.createElement('script');
     s.id = 'st-nl-turnstile';
     s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
     s.async = true;
-    s.onload = cb;
+    s.onload = function () {
+      cb();
+    };
     document.head.appendChild(s);
   }
 
@@ -451,6 +455,9 @@
     var submitBtn = root.querySelector('.st-nl-submit');
     var turnstileHost = root.querySelector('.st-nl-turnstile');
     var turnstileWidgetId = null;
+    var turnstileToken = '';
+    var turnstileMountPromise = null;
+    var TURNSTILE_WAIT_MS = 15000;
 
     function showSignup() {
       if (signupPanel) signupPanel.hidden = false;
@@ -468,19 +475,108 @@
       if (successBack) successBack.focus();
     }
 
-    function renderTurnstile() {
-      if (!SIGNUP.turnstileSiteKey || !window.turnstile || !turnstileHost) return;
-      turnstileHost.innerHTML = '';
-      // Managed widget in Cloudflare dashboard + interaction-only here:
-      // most visitors see nothing; checkbox only appears when a challenge is needed.
-      turnstileWidgetId = window.turnstile.render(turnstileHost, {
-        sitekey: SIGNUP.turnstileSiteKey,
-        theme: 'light',
-        appearance: 'interaction-only'
+    function readTurnstileToken() {
+      if (turnstileToken) return turnstileToken;
+      if (SIGNUP.turnstileSiteKey && window.turnstile && turnstileWidgetId != null) {
+        return window.turnstile.getResponse(turnstileWidgetId) || '';
+      }
+      return '';
+    }
+
+    /**
+     * Lazy-mount Turnstile (script + widget). Safe to call many times.
+     * Does not run on page load — only when warmed or on submit.
+     */
+    function ensureTurnstileMounted() {
+      if (!SIGNUP.turnstileSiteKey) {
+        return Promise.resolve();
+      }
+      if (turnstileWidgetId != null && window.turnstile) {
+        return Promise.resolve();
+      }
+      if (turnstileMountPromise) return turnstileMountPromise;
+
+      turnstileMountPromise = new Promise(function (resolve) {
+        ensureTurnstileScript(function () {
+          if (!window.turnstile || !turnstileHost) {
+            resolve();
+            return;
+          }
+          if (turnstileWidgetId != null) {
+            resolve();
+            return;
+          }
+          turnstileHost.innerHTML = '';
+          turnstileToken = '';
+          // Managed + interaction-only: invisible unless Cloudflare needs a checkbox.
+          turnstileWidgetId = window.turnstile.render(turnstileHost, {
+            sitekey: SIGNUP.turnstileSiteKey,
+            theme: 'light',
+            appearance: 'interaction-only',
+            callback: function (token) {
+              turnstileToken = token || '';
+            },
+            'expired-callback': function () {
+              turnstileToken = '';
+            },
+            'error-callback': function () {
+              turnstileToken = '';
+            }
+          });
+          resolve();
+        });
+      });
+      return turnstileMountPromise;
+    }
+
+    /** Wait until a token exists (or timeout). Used on submit so lazy mount still works. */
+    function waitForTurnstileToken(timeoutMs) {
+      if (!SIGNUP.turnstileSiteKey) {
+        return Promise.resolve('');
+      }
+      return ensureTurnstileMounted().then(function () {
+        var existing = readTurnstileToken();
+        if (existing) return existing;
+
+        return new Promise(function (resolve) {
+          var started = Date.now();
+          var timer = setInterval(function () {
+            var token = readTurnstileToken();
+            if (token || Date.now() - started >= timeoutMs) {
+              clearInterval(timer);
+              resolve(token || '');
+            }
+          }, 100);
+        });
       });
     }
 
-    ensureTurnstileScript(renderTurnstile);
+    var turnstileWarmStarted = false;
+    function warmTurnstile() {
+      if (turnstileWarmStarted) return;
+      turnstileWarmStarted = true;
+      ensureTurnstileMounted();
+    }
+
+    // Warm when the form is likely to be used — not on every pageview.
+    if (SIGNUP.turnstileSiteKey) {
+      form.addEventListener('focusin', warmTurnstile);
+      if (typeof IntersectionObserver === 'function' && (signupPanel || form)) {
+        var io = new IntersectionObserver(
+          function (entries) {
+            for (var i = 0; i < entries.length; i++) {
+              if (entries[i].isIntersecting) {
+                warmTurnstile();
+                io.disconnect();
+                break;
+              }
+            }
+          },
+          { root: null, rootMargin: '100px', threshold: 0.01 }
+        );
+        io.observe(signupPanel || form);
+      }
+    }
 
     if (successBack) {
       successBack.addEventListener('click', function () {
@@ -492,10 +588,12 @@
           }
         }
         showSignup();
+        turnstileToken = '';
         if (SIGNUP.turnstileSiteKey && window.turnstile && turnstileWidgetId != null) {
           window.turnstile.reset(turnstileWidgetId);
         } else {
-          renderTurnstile();
+          turnstileMountPromise = null;
+          warmTurnstile();
         }
         var emailInput = form.querySelector('input[name="email"]');
         if (emailInput) emailInput.focus();
@@ -534,39 +632,48 @@
       var honeypot = form.querySelector('input[name="hp_field"]');
       var hpField = honeypot ? String(honeypot.value || '') : '';
 
-      var turnstileToken = '';
-      if (SIGNUP.turnstileSiteKey && window.turnstile && turnstileWidgetId != null) {
-        turnstileToken = window.turnstile.getResponse(turnstileWidgetId) || '';
-        if (!turnstileToken) {
-          setStatus(statusEl, 'Please complete the verification challenge.', 'error');
-          return;
-        }
-      }
-
       if (submitBtn) submitBtn.disabled = true;
-      setStatus(statusEl, 'Submitting…', null);
+      setStatus(
+        statusEl,
+        SIGNUP.turnstileSiteKey ? 'Verifying…' : 'Submitting…',
+        null
+      );
 
-      var payload = {
-        email: email,
-        interests: interests,
-        turnstileToken: turnstileToken,
-        hp_field: hpField,
-        widgetVersion: WIDGET_VERSION
-      };
-      if (interests.length === 1) payload.interest = interests[0];
+      waitForTurnstileToken(TURNSTILE_WAIT_MS)
+        .then(function (token) {
+          if (SIGNUP.turnstileSiteKey && !token) {
+            setStatus(
+              statusEl,
+              'Please complete the verification challenge.',
+              'error'
+            );
+            if (submitBtn) submitBtn.disabled = false;
+            return null;
+          }
 
-      fetch(SIGNUP.apiUrl, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify(payload),
-        credentials: 'omit'
-      })
-        .then(function (res) {
-          return res.json().then(function (data) {
-            return { res: res, data: data || {} };
+          setStatus(statusEl, 'Submitting…', null);
+          var payload = {
+            email: email,
+            interests: interests,
+            turnstileToken: token || '',
+            hp_field: hpField,
+            widgetVersion: WIDGET_VERSION
+          };
+          if (interests.length === 1) payload.interest = interests[0];
+
+          return fetch(SIGNUP.apiUrl, {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify(payload),
+            credentials: 'omit'
+          }).then(function (res) {
+            return res.json().then(function (data) {
+              return { res: res, data: data || {} };
+            });
           });
         })
         .then(function (_ref) {
+          if (!_ref) return;
           var res = _ref.res;
           var data = _ref.data;
           if (typeof console !== 'undefined' && console.log) {
@@ -621,6 +728,7 @@
             window.turnstile &&
             turnstileWidgetId != null
           ) {
+            turnstileToken = '';
             window.turnstile.reset(turnstileWidgetId);
           }
         });

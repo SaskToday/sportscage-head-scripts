@@ -13,6 +13,11 @@ Use the tag / commit SHA later if you need to check out exactly that UI.
 
 ## Version history
 
+### 1.3.0 — 2026-10-30
+
+- Lazy Turnstile: load/render only when the form is near the viewport, focused, or on submit (avoids a verification per pageview)
+- Submit waits up to 15s for a token so signup still works if the user hits send immediately
+
 ### 1.2.0 — 2026-10-30
 
 - Turnstile `appearance: 'interaction-only'` (Managed widget) — checkbox only when Cloudflare needs a challenge
