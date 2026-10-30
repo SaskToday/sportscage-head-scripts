@@ -25,8 +25,45 @@ npx wrangler kv namespace create SIGNUP_STATE --preview
 # Secrets
 npx wrangler secret put MAILCHIMP_API_KEY
 npx wrangler secret put TURNSTILE_SECRET
-npx wrangler secret put ALERT_WEBHOOK_URL
+npx wrangler secret put ALERT_WEBHOOK_URL   # Teams webhook URL (see below)
 ```
+
+## Alerts → Microsoft Teams
+
+The Worker POSTs `{ "text": "…" }` to `ALERT_WEBHOOK_URL` when the circuit breaker trips, Mailchimp config errors spike, or a Turnstile failure wave is detected. Classic Office connectors are retired — use **Workflows**.
+
+### 1. Create the webhook in Teams
+
+1. Open the **team/channel** that should get signup alerts (e.g. a private ops channel).
+2. Next to the channel name, open **⋯ → Workflows**.
+3. Prefer the template **“Send webhook alerts to a channel”** (or create from blank with trigger **“When a Teams webhook request is received”**).
+4. Set **Who can trigger the flow** to **Anyone** (required so the Worker can POST without a user OAuth token).
+5. Confirm the flow posts to the channel you want → **Save**.
+6. Copy the **HTTP POST URL** the workflow shows after save.
+
+### 2. Store it on the Worker
+
+```bash
+cd signup-worker
+npx wrangler secret put ALERT_WEBHOOK_URL
+# paste the Teams webhook URL when prompted (do not commit it)
+```
+
+### 3. Verify the webhook (before relying on the breaker)
+
+Paste your URL into this curl (does not touch Mailchimp or the Worker):
+
+```bash
+curl -sS -X POST 'PASTE_TEAMS_WEBHOOK_URL' \
+  -H 'Content-Type: application/json' \
+  -d '{"text":"SaskToday signup worker test alert — you can ignore this."}'
+```
+
+You should see that message in the channel within a few seconds. If you get **401/403**, the flow is not set to **Anyone**.
+
+### 4. What you’ll see for real trips
+
+Alerts include reason, counts, time, cooldown, and the `wrangler kv key delete` commands to clear `breaker:tripped` / `breaker:alerted`. Only **one** alert fires per trip window (deduped in KV).
 
 Create a Turnstile widget (managed mode) for your site hostnames. Put the **site key** in the front-end (`SASKTODAY_SIGNUP.turnstileSiteKey` or edit `sasktoday-newsletter-inject.js`). Put the **secret** in `TURNSTILE_SECRET`.
 

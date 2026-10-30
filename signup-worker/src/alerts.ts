@@ -1,5 +1,13 @@
 import type { Env } from './env';
 
+/**
+ * POST alert JSON to ALERT_WEBHOOK_URL.
+ *
+ * Payload is Teams Workflows–friendly (`{ text }`) and also works with
+ * Slack-style incoming webhooks. Set the secret to a Teams channel webhook
+ * from: channel ⋯ → Workflows → "Send webhook alerts to a channel"
+ * (Who can trigger = Anyone). See README.
+ */
 export async function sendAlert(
   env: Env,
   payload: Record<string, unknown>
@@ -13,14 +21,21 @@ export async function sendAlert(
       : `Signup worker alert: ${JSON.stringify(payload)}`;
 
   try {
-    await fetch(url, {
+    // Keep body minimal: Workflows templates and classic webhooks key off `text`.
+    const res = await fetch(url, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        text,
-        ...payload
-      })
+      body: JSON.stringify({ text })
     });
+    if (!res.ok) {
+      console.log(
+        JSON.stringify({
+          outcome: 'alert_failed',
+          status: res.status,
+          detail: (await res.text()).slice(0, 200)
+        })
+      );
+    }
   } catch {
     // Never fail the request because alerting failed
     console.log(JSON.stringify({ outcome: 'alert_failed' }));
