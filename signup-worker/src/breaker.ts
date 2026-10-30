@@ -50,7 +50,8 @@ export async function tripBreaker(
 export async function countVerifiedSignup(env: Env): Promise<void> {
   const max = num(env.BREAKER_MAX_SIGNUPS_PER_HOUR, 100);
   const key = `count:signups:${hourBucket()}`;
-  const count = await incr(env.SIGNUP_STATE, key, 2 * 3600);
+  // Keep ~3 days so the daily digest can sum yesterday's hour buckets.
+  const count = await incr(env.SIGNUP_STATE, key, 3 * 24 * 3600);
   if (count > max) {
     await tripBreaker(env, 'signups_per_hour', { signups: count, max });
   }

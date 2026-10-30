@@ -13,6 +13,7 @@ import {
 import { hourBucket, incr, tenMinBucket } from './counters';
 import { sendAlertOnce } from './alerts';
 import { isDisposableEmailDomain } from './disposable';
+import { sendDisposableDailyDigest } from './daily-digest';
 
 const SUCCESS_MESSAGE =
   "Thanks! If you're new, check your inbox to confirm. If you're already subscribed, you're all set.";
@@ -251,28 +252,14 @@ async function handleSubscribe(
   await countVerifiedSignup(env);
 
   // Observe-only: match against disposable-domain snapshot (never blocks).
+  // Daily Teams digest (cron) reports matches as % of verified signups.
   const disposableHit = isDisposableEmailDomain(email);
   if (disposableHit) {
-    const disposableCount = await incr(
+    await incr(
       env.SIGNUP_STATE,
       `count:disposable:${hourBucket()}`,
-      2 * 3600
+      3 * 24 * 3600
     );
-    const disposableAlertMax = num(env.DISPOSABLE_ALERT_PER_HOUR, 25);
-    if (disposableCount > disposableAlertMax) {
-      await sendAlertOnce(
-        env,
-        `alert:disposable:${hourBucket()}`,
-        3600,
-        {
-          text:
-            `⚠️ ${disposableCount} verified signups this hour matched the ` +
-            `disposable-email domain list (observe-only — not blocked).\n` +
-            `Check Worker logs for disposableHit=true. If this is real abuse, ` +
-            `consider enabling a block later.`
-        }
-      );
-    }
   }
 
   // Mailchimp upsert per audience
@@ -401,5 +388,14 @@ export default {
         origin
       );
     }
+  },
+
+  /** Daily digest: previous America/Edmonton day disposable % → Teams */
+  async scheduled(
+    _controller: ScheduledController,
+    env: Env,
+    _ctx: ExecutionContext
+  ): Promise<void> {
+    await sendDisposableDailyDigest(env);
   }
 } satisfies ExportedHandler<Env>;

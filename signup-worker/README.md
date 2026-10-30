@@ -130,11 +130,19 @@ Add a Cloudflare WAF rate-limiting rule on `/subscribe` so floods are blocked be
 Verified signups (past Turnstile + rate limits) are checked against a snapshot of the [disposable-email-domains](https://github.com/disposable-email-domains/disposable-email-domains) community list. **Matches are not blocked** — we only:
 
 - Set `disposableHit: true` on the success log line
-- Increment KV `count:disposable:YYYYMMDDHH`
-- Send a Teams alert if hits exceed `DISPOSABLE_ALERT_PER_HOUR` (default 25) in a UTC hour
+- Increment KV `count:disposable:YYYYMMDDHH` (kept ~3 days, same as signup counters)
+
+**Daily Teams digest** (cron `10 6 * * *` UTC ≈ end of day America/Edmonton): previous local calendar day’s disposable matches as a **percentage of verified signups**. Example:
+
+```
+SaskToday signup digest (2026-10-30 America/Edmonton)
+Verified signups: 40
+Disposable-domain matches: 2 (5.0% of verified)
+Observe-only — matches are not blocked.
+```
 
 ```bash
-# Current hour's hit count (UTC)
+# Current UTC hour hit count
 npx wrangler kv key get --binding SIGNUP_STATE --remote --preview false \
   "count:disposable:$(date -u +%Y%m%d%H)"
 

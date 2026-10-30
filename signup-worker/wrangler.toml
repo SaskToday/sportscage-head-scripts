@@ -30,8 +30,11 @@ BREAKER_COOLDOWN_SECONDS = "3600"
 TURNSTILE_FAIL_ALERT_PER_10MIN = "200"
 TURNSTILE_FAIL_MAX_PER_IP_10MIN = "5"
 TURNSTILE_FAIL_BLOCK_SECONDS = "600"
-# Observe-only disposable-domain hits (does not block). Alert if over this / UTC hour.
-DISPOSABLE_ALERT_PER_HOUR = "25"
+
+# Daily disposable digest → Teams (previous America/Edmonton calendar day).
+# 06:10 UTC ≈ 00:10 MDT / 23:10 MST — close to local end-of-day.
+[triggers]
+crons = ["10 6 * * *"]
 
 [observability]
 enabled = true

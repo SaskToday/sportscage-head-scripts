@@ -17,8 +17,6 @@ export interface Env {
   TURNSTILE_FAIL_ALERT_PER_10MIN: string;
   TURNSTILE_FAIL_MAX_PER_IP_10MIN: string;
   TURNSTILE_FAIL_BLOCK_SECONDS: string;
-  /** Observe-only: Teams alert if disposable-domain hits exceed this per UTC hour */
-  DISPOSABLE_ALERT_PER_HOUR: string;
 }
 
 export function parseList(csv: string): string[] {
