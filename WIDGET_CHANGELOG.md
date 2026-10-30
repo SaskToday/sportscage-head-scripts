@@ -13,9 +13,14 @@ Use the tag / commit SHA later if you need to check out exactly that UI.
 
 ## Version history
 
+### 1.3.1 — 2026-10-30
+
+- Turnstile warms only on form engagement (focus / pointer), not viewport — better for above-the-fold embeds
+- Submit still mounts + waits for a token if the user never interacted first
+
 ### 1.3.0 — 2026-10-30
 
-- Lazy Turnstile: load/render only when the form is near the viewport, focused, or on submit (avoids a verification per pageview)
+- Lazy Turnstile: load/render on viewport/focus/submit (avoided a verification per pageview)
 - Submit waits up to 15s for a token so signup still works if the user hits send immediately
 
 ### 1.2.0 — 2026-10-30

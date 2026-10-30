@@ -9,7 +9,7 @@
  */
 (function () {
   // Bump when shipping widget changes; add a note in WIDGET_CHANGELOG.md
-  var WIDGET_VERSION = '1.3.0';
+  var WIDGET_VERSION = '1.3.1';
 
   // ---------------------------------------------------------------------------
   // DEPLOY CONFIG — set after Worker + Turnstile are live
@@ -558,24 +558,11 @@
       ensureTurnstileMounted();
     }
 
-    // Warm when the form is likely to be used — not on every pageview.
+    // Warm only on real engagement — not viewport (above-the-fold forms would
+    // otherwise fire Turnstile for every passer-by). Submit always waits for a token.
     if (SIGNUP.turnstileSiteKey) {
       form.addEventListener('focusin', warmTurnstile);
-      if (typeof IntersectionObserver === 'function' && (signupPanel || form)) {
-        var io = new IntersectionObserver(
-          function (entries) {
-            for (var i = 0; i < entries.length; i++) {
-              if (entries[i].isIntersecting) {
-                warmTurnstile();
-                io.disconnect();
-                break;
-              }
-            }
-          },
-          { root: null, rootMargin: '100px', threshold: 0.01 }
-        );
-        io.observe(signupPanel || form);
-      }
+      form.addEventListener('pointerdown', warmTurnstile);
     }
 
     if (successBack) {
