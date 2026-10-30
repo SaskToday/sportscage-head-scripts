@@ -13,6 +13,11 @@ Use the tag / commit SHA later if you need to check out exactly that UI.
 
 ## Version history
 
+### 1.1.0 — 2026-10-30
+
+- Success uses a dedicated panel (hides the form) with **← Back to signup**
+- New success copy: check inbox / may need to confirm if new subscriber
+
 ### 1.0.0 — 2026-10-29
 
 - Tagline-lead card design (Alfa Slab One / Source Sans 3)

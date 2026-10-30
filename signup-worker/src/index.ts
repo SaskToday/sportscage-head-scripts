@@ -16,7 +16,7 @@ import { isDisposableEmailDomain } from './disposable';
 import { sendDisposableDailyDigest } from './daily-digest';
 
 const SUCCESS_MESSAGE =
-  "Thanks! If you're new, check your inbox to confirm. If you're already subscribed, you're all set.";
+  "Thanks! Please check your inbox — if you're a new subscriber, we may need you to confirm your subscription.";
 
 type SubscribeBody = {
   email?: unknown;

@@ -9,7 +9,7 @@
  */
 (function () {
   // Bump when shipping widget changes; add a note in WIDGET_CHANGELOG.md
-  var WIDGET_VERSION = '1.0.0';
+  var WIDGET_VERSION = '1.1.0';
 
   // ---------------------------------------------------------------------------
   // DEPLOY CONFIG — set after Worker + Turnstile are live
@@ -150,7 +150,7 @@
   var TERMS_URL = 'https://www.sasktoday.ca/other/terms-of-service';
   var PRIVACY_URL = 'https://www.sasktoday.ca/other/privacy-policy';
   var SUCCESS_FALLBACK =
-    "Thanks! If you're new, check your inbox to confirm. If you're already subscribed, you're all set.";
+    "Thanks! Please check your inbox — if you're a new subscriber, we may need you to confirm your subscription.";
 
   function buildLegalHtml(brand) {
     return (
@@ -310,6 +310,7 @@
       '.st-tl-card__headline-accent { color: var(--accent); }' +
       '.st-tl-card__body { margin: 0; font-size: 20px; line-height: 1.45; color: var(--ink-soft); }' +
       '.st-tl-card a { color: var(--accent); } .st-tl-card a:hover { color: var(--accent-hover); }' +
+      '.st-tl-card .st-nl-signup { display: flex; flex-direction: column; gap: 20px; }' +
       '.st-tl-card form { margin: 0; display: flex; flex-direction: column; gap: 16px; }' +
       '.st-tl-card .mc-field-group { display: flex; flex-direction: column; gap: 10px; }' +
       '.st-tl-card .mc-field-group label { font-size: 12px; line-height: 1; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); }' +
@@ -337,6 +338,16 @@
       '.st-tl-card .st-nl-choices__error, .st-tl-card .st-nl-status.is-error { color: var(--danger); }' +
       '.st-tl-card .st-nl-status.is-ok { color: var(--accent-hover); }' +
       '.st-tl-card .st-nl-turnstile { min-height: 0; }' +
+      '.st-tl-card .st-nl-success { display: flex; flex-direction: column; gap: 20px; }' +
+      '.st-tl-card .st-nl-success[hidden], .st-tl-card .st-nl-signup[hidden] { display: none !important; }' +
+      '.st-tl-card .st-nl-success__title { margin: 0; font-family: var(--serif); font-weight: 400; font-size: 28px; line-height: 1.15; color: var(--ink); }' +
+      '.st-tl-card .st-nl-success__message { margin: 0; font-size: 20px; line-height: 1.45; color: var(--ink-soft); }' +
+      '.st-tl-card .st-nl-success__back {' +
+      '  -webkit-appearance: none; appearance: none; height: 60px; width: 100%; background: transparent; color: var(--ink);' +
+      '  border: 3px solid var(--ink); border-radius: 3px; font-family: var(--sans); font-weight: 700; font-size: 16px;' +
+      '  letter-spacing: 0.22em; text-transform: uppercase; cursor: pointer;' +
+      '}' +
+      '.st-tl-card .st-nl-success__back:hover { background: var(--ink); color: #fff; }' +
       '.st-tl-card__legal { margin: 4px 0 0; font-size: 14px; line-height: 1.55; color: var(--muted); }' +
       '</style>' +
       '<div class="st-tl-card" data-newsletter-key="' +
@@ -354,6 +365,7 @@
         : '') +
       escapeHtml(config.headlineAfter || '') +
       '</h1>' +
+      '  <div class="st-nl-signup">' +
       '  <p class="st-tl-card__body">' +
       escapeHtml(config.body || '') +
       '</p>' +
@@ -389,6 +401,12 @@
       submitId +
       '">Sign me up →</button>' +
       '  </form>' +
+      '  </div>' +
+      '  <div class="st-nl-success" hidden>' +
+      '    <p class="st-nl-success__title">You\'re all set</p>' +
+      '    <p class="st-nl-success__message" role="status"></p>' +
+      '    <button type="button" class="st-nl-success__back">← Back to signup</button>' +
+      '  </div>' +
       '  <p class="st-tl-card__legal">' +
       buildLegalHtml(config.legalBrand) +
       '</p>' +
@@ -425,10 +443,30 @@
     var form = root.querySelector('form');
     if (!form) return;
 
+    var signupPanel = root.querySelector('.st-nl-signup');
+    var successPanel = root.querySelector('.st-nl-success');
+    var successMessage = root.querySelector('.st-nl-success__message');
+    var successBack = root.querySelector('.st-nl-success__back');
     var statusEl = root.querySelector('.st-nl-status');
     var submitBtn = root.querySelector('.st-nl-submit');
     var turnstileHost = root.querySelector('.st-nl-turnstile');
     var turnstileWidgetId = null;
+
+    function showSignup() {
+      if (signupPanel) signupPanel.hidden = false;
+      if (successPanel) successPanel.hidden = true;
+      if (successMessage) successMessage.textContent = '';
+      setStatus(statusEl, '', null);
+    }
+
+    function showSuccess(message) {
+      if (successMessage) {
+        successMessage.textContent = message || SUCCESS_FALLBACK;
+      }
+      if (signupPanel) signupPanel.hidden = true;
+      if (successPanel) successPanel.hidden = false;
+      if (successBack) successBack.focus();
+    }
 
     function renderTurnstile() {
       if (!SIGNUP.turnstileSiteKey || !window.turnstile || !turnstileHost) return;
@@ -440,6 +478,26 @@
     }
 
     ensureTurnstileScript(renderTurnstile);
+
+    if (successBack) {
+      successBack.addEventListener('click', function () {
+        form.reset();
+        if (config.interestChoices) {
+          var boxes = form.querySelectorAll('.st-nl-choices input[type="checkbox"]');
+          for (var i = 0; i < boxes.length; i++) {
+            boxes[i].checked = !!config.interestChoices[i].checked;
+          }
+        }
+        showSignup();
+        if (SIGNUP.turnstileSiteKey && window.turnstile && turnstileWidgetId != null) {
+          window.turnstile.reset(turnstileWidgetId);
+        } else {
+          renderTurnstile();
+        }
+        var emailInput = form.querySelector('input[name="email"]');
+        if (emailInput) emailInput.focus();
+      });
+    }
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
@@ -512,14 +570,7 @@
             console.log('[SaskToday signup]', res.status, data);
           }
           if (res.ok && data.ok) {
-            setStatus(statusEl, data.message || SUCCESS_FALLBACK, 'ok');
-            form.reset();
-            if (config.interestChoices) {
-              var boxes = form.querySelectorAll('.st-nl-choices input[type="checkbox"]');
-              for (var i = 0; i < boxes.length; i++) {
-                boxes[i].checked = !!config.interestChoices[i].checked;
-              }
-            }
+            showSuccess(data.message || SUCCESS_FALLBACK);
           } else if (data.code === 'rate_limited' || res.status === 429) {
             setStatus(
               statusEl,
@@ -560,7 +611,13 @@
         })
         .then(function () {
           if (submitBtn) submitBtn.disabled = false;
-          if (SIGNUP.turnstileSiteKey && window.turnstile && turnstileWidgetId != null) {
+          if (
+            signupPanel &&
+            !signupPanel.hidden &&
+            SIGNUP.turnstileSiteKey &&
+            window.turnstile &&
+            turnstileWidgetId != null
+          ) {
             window.turnstile.reset(turnstileWidgetId);
           }
         });

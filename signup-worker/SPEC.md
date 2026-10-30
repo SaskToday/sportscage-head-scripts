@@ -104,7 +104,7 @@ Do the cheap checks first and the expensive ones last.
      - **Upstream failures** (429, 5xx, timeouts): return 502 with a friendly message and count toward the Mailchimp-error breaker.
      - Anything unrecognized: treat as a config error so it gets noticed.
    - Never pass Mailchimp response bodies through to the client.
-9. **Respond with a generic message.** Return the same success payload regardless of whether the contact was new, existing, pending or unsubscribed. This avoids leaking whether an email is on our list. Suggested copy: "Thanks! If you're new, check your inbox to confirm. If you're already subscribed, you're all set."
+9. **Respond with a generic message.** Return the same success payload regardless of whether the contact was new, existing, pending or unsubscribed. This avoids leaking whether an email is on our list. Copy: "Thanks! Please check your inbox — if you're a new subscriber, we may need you to confirm your subscription." The widget shows this on a dedicated success panel (form hidden) with a control to return to the signup form.
 
 Note: MD5 is required here by Mailchimp's API (it is an identifier, not a security control). The Workers runtime supports `crypto.subtle.digest("MD5", ...)`.
 
