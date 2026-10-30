@@ -125,6 +125,26 @@ There is **no** HTTP admin reset endpoint. After a trip:
 
 Add a Cloudflare WAF rate-limiting rule on `/subscribe` so floods are blocked before Worker invocation (protects shared Workers quota).
 
+## Disposable-domain monitoring (observe-only)
+
+Verified signups (past Turnstile + rate limits) are checked against a snapshot of the [disposable-email-domains](https://github.com/disposable-email-domains/disposable-email-domains) community list. **Matches are not blocked** — we only:
+
+- Set `disposableHit: true` on the success log line
+- Increment KV `count:disposable:YYYYMMDDHH`
+- Send a Teams alert if hits exceed `DISPOSABLE_ALERT_PER_HOUR` (default 25) in a UTC hour
+
+```bash
+# Current hour's hit count (UTC)
+npx wrangler kv key get --binding SIGNUP_STATE --remote --preview false \
+  "count:disposable:$(date -u +%Y%m%d%H)"
+
+# Refresh the bundled domain snapshot, then redeploy
+npm run refresh:disposable-domains
+npm run deploy
+```
+
+If monitoring shows real abuse, we can flip matched domains to a 400 later; until then legitimate subscribers are never rejected for list membership alone.
+
 ## Tests
 
 ```bash

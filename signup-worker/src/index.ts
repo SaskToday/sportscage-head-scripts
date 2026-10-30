@@ -12,6 +12,7 @@ import {
 } from './breaker';
 import { hourBucket, incr, tenMinBucket } from './counters';
 import { sendAlertOnce } from './alerts';
+import { isDisposableEmailDomain } from './disposable';
 
 const SUCCESS_MESSAGE =
   "Thanks! If you're new, check your inbox to confirm. If you're already subscribed, you're all set.";
@@ -249,6 +250,31 @@ async function handleSubscribe(
   // Count toward signup breaker only after Turnstile + rate limits
   await countVerifiedSignup(env);
 
+  // Observe-only: match against disposable-domain snapshot (never blocks).
+  const disposableHit = isDisposableEmailDomain(email);
+  if (disposableHit) {
+    const disposableCount = await incr(
+      env.SIGNUP_STATE,
+      `count:disposable:${hourBucket()}`,
+      2 * 3600
+    );
+    const disposableAlertMax = num(env.DISPOSABLE_ALERT_PER_HOUR, 25);
+    if (disposableCount > disposableAlertMax) {
+      await sendAlertOnce(
+        env,
+        `alert:disposable:${hourBucket()}`,
+        3600,
+        {
+          text:
+            `⚠️ ${disposableCount} verified signups this hour matched the ` +
+            `disposable-email domain list (observe-only — not blocked).\n` +
+            `Check Worker logs for disposableHit=true. If this is real abuse, ` +
+            `consider enabling a block later.`
+        }
+      );
+    }
+  }
+
   // Mailchimp upsert per audience
   for (const [audienceId, targets] of resolved.byAudience) {
     const result = await upsertMemberInterests({
@@ -276,6 +302,7 @@ async function handleSubscribe(
         interests: interestKeys,
         audienceId,
         widgetVersion,
+        disposableHit,
         activityEventRecorded:
           result.kind === 'ok' ? result.activityEventRecorded : undefined,
         title: result.kind === 'member_state' ? result.title : undefined

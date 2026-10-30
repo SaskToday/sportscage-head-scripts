@@ -191,4 +191,4 @@ One reusable snippet per form, with:
 ## Out of scope for now
 
 - Sending existing subscribers a confirmation before adding a group (revisit only if abuse shows up).
-- Disposable-email blocking (add later if junk signups appear).
+- Disposable-email **blocking** (monitoring is in place — see Logging / disposableHit; enable a hard block only if abuse appears).
