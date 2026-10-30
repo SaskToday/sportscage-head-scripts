@@ -3,10 +3,12 @@ import type { Env } from './env';
 /**
  * POST alert JSON to ALERT_WEBHOOK_URL.
  *
- * Payload is Teams Workflows–friendly (`{ text }`) and also works with
- * Slack-style incoming webhooks. Set the secret to a Teams channel webhook
- * from: channel ⋯ → Workflows → "Send webhook alerts to a channel"
- * (Who can trigger = Anyone). See README.
+ * Teams Workflows templates that use **Post card in a chat or channel**
+ * require an Adaptive Card root (`type: "AdaptiveCard"`). Plain `{ text }`
+ * fails with: Property 'type' must be 'AdaptiveCard'.
+ *
+ * We also include top-level `text` for flows that use **Post message** instead.
+ * See README for setup.
  */
 export async function sendAlert(
   env: Env,
@@ -23,12 +25,32 @@ export async function sendAlert(
       ? payload.text
       : `Signup worker alert: ${JSON.stringify(payload)}`;
 
+  // Adaptive Card for Teams "Post card in a chat or channel" (required shape).
+  const body = {
+    type: 'AdaptiveCard',
+    $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',
+    version: '1.4',
+    body: [
+      {
+        type: 'TextBlock',
+        text: 'SaskToday signup worker',
+        weight: 'Bolder',
+        size: 'Medium',
+        wrap: true
+      },
+      {
+        type: 'TextBlock',
+        text,
+        wrap: true
+      }
+    ]
+  };
+
   try {
-    // Keep body minimal: Workflows templates and classic webhooks key off `text`.
     const res = await fetch(url, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ text })
+      body: JSON.stringify(body)
     });
     if (!res.ok) {
       console.log(

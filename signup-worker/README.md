@@ -30,7 +30,9 @@ npx wrangler secret put ALERT_WEBHOOK_URL   # Teams webhook URL (see below)
 
 ## Alerts → Microsoft Teams
 
-The Worker POSTs `{ "text": "…" }` to `ALERT_WEBHOOK_URL` when the circuit breaker trips, Mailchimp config errors spike, or a Turnstile failure wave is detected. Classic Office connectors are retired — use **Workflows**.
+The Worker POSTs an **Adaptive Card** JSON body (plus a top-level `text` field) to `ALERT_WEBHOOK_URL` when the circuit breaker trips, Mailchimp config errors spike, or a Turnstile failure wave is detected. Classic Office connectors are retired — use **Workflows**.
+
+Templates that **Post card in a chat or channel** require `type: "AdaptiveCard"` in the body; a bare `{ "text": "…" }` fails with `Property 'type' must be 'AdaptiveCard'`.
 
 ### 1. Create the webhook in Teams
 
@@ -40,6 +42,8 @@ The Worker POSTs `{ "text": "…" }` to `ALERT_WEBHOOK_URL` when the circuit bre
 4. Set **Who can trigger the flow** to **Anyone** (required so the Worker can POST without a user OAuth token).
 5. Confirm the flow posts to the channel you want → **Save**.
 6. Copy the **HTTP POST URL** the workflow shows after save.
+
+If the template’s **Post card** step fails, either keep our Adaptive Card payload (default), or switch that step to **Post message in a chat or channel** and set the message to `triggerBody()?['text']`.
 
 ### 2. Store it on the Worker
 
@@ -54,12 +58,20 @@ npx wrangler secret put ALERT_WEBHOOK_URL
 Paste your URL into this curl (does not touch Mailchimp or the Worker):
 
 ```bash
-curl -sS -X POST 'PASTE_TEAMS_WEBHOOK_URL' \
+URL='PASTE_TEAMS_WEBHOOK_URL'
+
+curl -sS -g -X POST "$URL" \
   -H 'Content-Type: application/json' \
-  -d '{"text":"SaskToday signup worker test alert — you can ignore this."}'
+  -d '{
+    "type":"AdaptiveCard",
+    "$schema":"http://adaptivecards.io/schemas/adaptive-card.json",
+    "version":"1.4",
+    "body":[{"type":"TextBlock","text":"SaskToday signup worker test alert — ignore.","wrap":true}],
+    "text":"SaskToday signup worker test alert — ignore."
+  }'
 ```
 
-You should see that message in the channel within a few seconds. If you get **401/403**, the flow is not set to **Anyone**.
+You should see that card in the channel within a few seconds (HTTP **202**). If you get **401/403**, the flow is not set to **Anyone**.
 
 ### 4. What you’ll see for real trips
 

@@ -26,7 +26,7 @@ Replace the Mailchimp embed forms with our own front-end forms that post to a Cl
 |---|---|
 | `MAILCHIMP_API_KEY` | Marketing API key |
 | `TURNSTILE_SECRET` | Turnstile secret key |
-| `ALERT_WEBHOOK_URL` | Teams Workflows (or Slack-style) webhook URL; Worker POSTs `{ "text": "…" }` |
+| `ALERT_WEBHOOK_URL` | Teams Workflows webhook URL; Worker POSTs an Adaptive Card (`type: AdaptiveCard`) plus `text` |
 
 ### Vars (`wrangler.toml`)
 
