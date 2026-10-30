@@ -13,6 +13,10 @@ Use the tag / commit SHA later if you need to check out exactly that UI.
 
 ## Version history
 
+### 1.2.0 — 2026-10-30
+
+- Turnstile `appearance: 'interaction-only'` (Managed widget) — checkbox only when Cloudflare needs a challenge
+
 ### 1.1.0 — 2026-10-30
 
 - Success uses a dedicated panel (hides the form) with **← Back to signup**
