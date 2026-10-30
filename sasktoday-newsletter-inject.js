@@ -471,9 +471,12 @@
     function renderTurnstile() {
       if (!SIGNUP.turnstileSiteKey || !window.turnstile || !turnstileHost) return;
       turnstileHost.innerHTML = '';
+      // Managed widget in Cloudflare dashboard + interaction-only here:
+      // most visitors see nothing; checkbox only appears when a challenge is needed.
       turnstileWidgetId = window.turnstile.render(turnstileHost, {
         sitekey: SIGNUP.turnstileSiteKey,
-        theme: 'light'
+        theme: 'light',
+        appearance: 'interaction-only'
       });
     }
 
