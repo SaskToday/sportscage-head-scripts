@@ -22,8 +22,18 @@ Keep both semver (`MAJOR.MINOR.PATCH`). The combined string is capped at 40 char
 1. Change the relevant newsletter entry and/or shared shell code.
 2. Bump **only** what changed (`version` on that newsletter, and/or `WIDGET_VERSION`).
 3. Add a note below.
-4. Sync + deploy the Worker asset; bump the site embed `?v=` to the new shell version so browsers fetch the file.
-5. Commit. Optionally tag: `git tag widget-vX.Y.Z && git push --tags`.
+4. Capture snapshots (keeps a visual archive you can reopen later):
+
+   ```bash
+   cd signup-worker && npm run snapshot:widgets
+   # or: npm run snapshot:widgets -- --only sasktoday
+   ```
+
+   Writes repo-root `widget-snapshots/<key>/<nl>+shell-<shell>/{form,success}.png` + `config.json`.
+5. Sync + deploy the Worker asset; bump the site embed `?v=` whenever the JS file changed so browsers fetch it.
+6. Commit (include new `widget-snapshots/` folders). Optionally tag: `git tag widget-vX.Y.Z && git push --tags`.
+
+See [`widget-snapshots/README.md`](widget-snapshots/README.md).
 
 ## Newsletter versions (current)
 
@@ -42,6 +52,7 @@ Keep both semver (`MAJOR.MINOR.PATCH`). The combined string is capped at 40 char
 ### 1.4.0 — 2026-10-30
 
 - Per-newsletter `version` fields; API `widgetVersion` is now `{key}@{nl}+{shell}` (was a single global string)
+- Versioned visual archive: `npm run snapshot:widgets` → `widget-snapshots/<key>/<nl>+shell-<shell>/`
 
 ### 1.3.6 — 2026-10-30
 

@@ -1,0 +1,20 @@
+{
+  "capturedAt": "2026-10-30T19:30:46.927Z",
+  "key": "saskag-today",
+  "newsletterVersion": "1.0.0",
+  "shellVersion": "1.4.0",
+  "widgetVersion": "saskag-today@1.0.0+1.4.0",
+  "preview": "previews/saskag-today.html",
+  "config": {
+    "version": "1.0.0",
+    "layout": "tagline-lead",
+    "accent": "#016a1b",
+    "whisker": "SaskAgToday Daily Newsletter",
+    "headlineBefore": "Key ",
+    "headlineAccent": "Agriculture",
+    "headlineAfter": " news in a five-minute read.",
+    "body": "The latest ag news, grain prices and precision weather forecasts. Delivered to you 5 days a week, Monday to Friday.",
+    "legalBrand": "SaskAgToday",
+    "interestKey": "saskagtoday-daily"
+  }
+}

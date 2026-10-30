@@ -215,6 +215,15 @@ The Worker attaches that string to the Mailchimp Activity event as `widget_versi
 
 History: repo-root [`WIDGET_CHANGELOG.md`](../WIDGET_CHANGELOG.md). Bump the site embed `?v=` to the new shell version when deploying.
 
+After bumping a newsletter or shell version, capture screenshots for the archive:
+
+```bash
+npm run snapshot:widgets
+# npm run snapshot:widgets -- --only sasktoday
+```
+
+Output lands in repo-root [`widget-snapshots/`](../widget-snapshots/) (`form.png`, `success.png`, `config.json` per version).
+
 ## Interest keys
 
 | Key | Audience | Notes |
