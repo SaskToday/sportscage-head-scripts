@@ -26,7 +26,9 @@ export function parseList(csv: string): string[] {
     .filter(Boolean);
 }
 
+/** Parse a non-negative number from an env var. Empty/invalid → fallback. Zero is allowed (e.g. trip breaker on first signup in tests). */
 export function num(envValue: string, fallback: number): number {
+  if (envValue == null || String(envValue).trim() === '') return fallback;
   const n = Number(envValue);
-  return Number.isFinite(n) && n > 0 ? n : fallback;
+  return Number.isFinite(n) && n >= 0 ? n : fallback;
 }
