@@ -13,9 +13,14 @@ Use the tag / commit SHA later if you need to check out exactly that UI.
 
 ## Version history
 
+### 1.3.3 — 2026-10-30
+
+- Fix CSS string concat that turned style selectors into `NaN` (legend reset + wrap padding never applied)
+- Same visual intent as 1.3.2: no legend underline, accent shadow inside host slot, ~30% smaller type
+
 ### 1.3.2 — 2026-10-30
 
-- Production style polish: reset `legend` underline inheritance, keep accent shadow inside the host slot, ~30% smaller headline/body/legal type
+- Production style polish: reset `legend` underline inheritance, keep accent shadow inside the host slot, ~30% smaller headline/body/legal type (broken in the field — use 1.3.3)
 
 ### 1.3.1 — 2026-10-30
 

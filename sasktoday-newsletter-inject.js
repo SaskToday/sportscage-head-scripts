@@ -9,7 +9,7 @@
  */
 (function () {
   // Bump when shipping widget changes; add a note in WIDGET_CHANGELOG.md
-  var WIDGET_VERSION = '1.3.2';
+  var WIDGET_VERSION = '1.3.3';
 
   // ---------------------------------------------------------------------------
   // DEPLOY CONFIG — set after Worker + Turnstile are live
@@ -291,9 +291,11 @@
     var turnstileId = uid('st-nl-ts', newsletterKey);
     var submitId = uid('st-nl-submit', newsletterKey);
 
+    // Note: never put `/* comment */ +` between CSS string fragments — unary +
+    // coerces the next string to NaN and corrupts selectors (e.g. "nan.st-tl-card").
     return (
       '<style type="text/css">' +
-      /* Outer wrap reserves space for the offset accent shadow so it stays inside the host slot. */ +
+      // Outer wrap reserves space for the offset accent shadow inside the host slot.
       '.st-tl-wrap {' +
       '  box-sizing: border-box; width: 100%; max-width: 100%;' +
       '  margin-top: 28px; padding: 0 14px 14px 0;' +
@@ -341,7 +343,7 @@
       '.st-tl-card .st-nl-submit:hover { background: var(--accent); }' +
       '.st-tl-card .st-nl-submit:disabled { opacity: 0.6; cursor: wait; }' +
       '.st-tl-card .st-nl-choices { border: 0 !important; margin: 0; padding: 0; min-width: 0; }' +
-      /* Host templates often style bare <legend> with underlines / ::after rules — reset hard. */ +
+      // Host templates often style bare <legend> with underlines / ::after — reset hard.
       '.st-tl-card .st-nl-choices legend,' +
       '.st-tl-card .st-nl-choices .st-nl-choices__legend {' +
       '  font-size: 11px !important; line-height: 1.2 !important; font-weight: 700 !important;' +

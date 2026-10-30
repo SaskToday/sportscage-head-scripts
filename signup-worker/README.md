@@ -129,7 +129,7 @@ The inject script is hosted on the same Worker (Cloudflare):
   };
 </script>
 <script
-  src="https://sasktoday-signup.nmorrison.workers.dev/sasktoday-newsletter-inject.js?v=1.3.2"
+  src="https://sasktoday-signup.nmorrison.workers.dev/sasktoday-newsletter-inject.js?v=1.3.3"
   defer
 ></script>
 ```
