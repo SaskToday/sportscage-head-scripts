@@ -1,0 +1,226 @@
+<!--
+  Homepage widget: Streaming & On Demand.
+
+  Paste the markup below into the WYSIWYG widget.
+  The script reads the RSS feed and replaces #iframe-section
+  with the show that should be on.
+
+  RSS_URL is still the worker that is live today. After
+  sportscage-live-youtube is deployed with YOUTUBE_API_KEY, change
+  RSS_URL to:
+  https://sportscage-live-youtube.nmorrison.workers.dev/rss.xml
+-->
+
+<div class="text-pre-show">
+    <div class="audio-icon">
+        <div class="bar">&nbsp;</div>
+        <div class="bar">&nbsp;</div>
+        <div class="bar">&nbsp;</div>
+    </div>
+</div>
+<div>
+    <iframe
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen=""
+        class="youtube-video"
+        frameborder="0"
+        id="iframe-section"
+        referrerpolicy="strict-origin-when-cross-origin"
+        src="https://www.youtube.com/embed/0BDLTDEB8UU?autoplay=1&amp;mute=1&amp;cc_load_policy=1"
+        style="border-radius: 5px"
+        title="YouTube video player"
+    ></iframe>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        var RSS_URL = "https://youtube-playlist.pinkal.workers.dev/rss.xml";
+
+        $.ajax({
+            url: RSS_URL,
+            dataType: "xml",
+            success: function (xml) {
+                var latestVideos = [];
+                var liveVideos = [];
+                var now = new Date();
+                var today = now.toISOString().split("T")[0];
+
+                $(xml).find("item").each(function () {
+                    var videoId = $(this).find("guid").text();
+                    var title = $(this).find("title").text();
+                    var pubDate = $(this).find("pubDate").text();
+                    var actualStartTime = $(this).find("actualStartTime").text();
+                    var scheduledStartTime = $(this).find("scheduledStartTime").text();
+                    var actualEndTime = $(this).find("actualEndTime").text();
+                    var link = $(this).find("link").text();
+
+                    var video = {
+                        videoId: videoId,
+                        title: title,
+                        pubDate: pubDate,
+                        actualStartTime: actualStartTime,
+                        scheduledStartTime: scheduledStartTime,
+                        actualEndTime: actualEndTime,
+                        url: link
+                    };
+
+                    if (actualStartTime && !actualEndTime) {
+                        liveVideos.push(video);
+                    }
+
+                    latestVideos.push(video);
+                });
+
+                var selectedVideo = null;
+
+                var scheduledVideos = latestVideos.filter(function (v) {
+                    return v.scheduledStartTime && new Date(v.scheduledStartTime) <= now;
+                });
+
+                if (scheduledVideos.length > 0) {
+                    scheduledVideos.sort(function (a, b) {
+                        return new Date(b.scheduledStartTime) - new Date(a.scheduledStartTime);
+                    });
+                    selectedVideo = scheduledVideos[0];
+                } else if (liveVideos.length > 0) {
+                    selectedVideo = liveVideos[0];
+                } else {
+                    var todayVideos = latestVideos.filter(function (v) {
+                        return v.actualStartTime && v.actualStartTime.startsWith(today);
+                    });
+
+                    if (todayVideos.length > 0) {
+                        todayVideos.sort(function (a, b) {
+                            return new Date(b.actualStartTime) - new Date(a.actualStartTime);
+                        });
+                        selectedVideo = todayVideos[0];
+                    } else {
+                        var pastVideos = latestVideos.filter(function (v) {
+                            return v.actualStartTime && new Date(v.actualStartTime) < now;
+                        });
+
+                        if (pastVideos.length > 0) {
+                            pastVideos.sort(function (a, b) {
+                                return new Date(b.actualStartTime) - new Date(a.actualStartTime);
+                            });
+                            selectedVideo = pastVideos[0];
+                        }
+                    }
+                }
+
+                if (selectedVideo) {
+                    $("#iframe-section").attr(
+                        "src",
+                        "https://www.youtube.com/embed/" + selectedVideo.videoId + "?autoplay=1&mute=1&cc_load_policy=1"
+                    );
+                }
+            },
+            error: function () {
+                console.error("Failed to load RSS feed");
+            }
+        });
+    });
+</script>
+
+<style type="text/css">
+    .live-listen-section h2,
+    .live-listen-section h2.section-heading {
+        border-bottom: 2px solid #016a1b;
+    }
+    .live-listen-section h2 {
+        font-size: 1.5em;
+        font-weight: 700;
+    }
+    .live-listen-section {
+        padding: 10px 15px;
+        background-color: #f2f2f2;
+        margin-bottom: 15px;
+        border-radius: 4px 4px 0 0;
+        position: relative;
+    }
+    .live-listen-section a.btn {
+        letter-spacing: 0.7px;
+    }
+    .live-listen-section a.btn > i {
+        padding-right: 3px;
+    }
+    .live-listen-section.dark-bg {
+        background-color: #00400e;
+    }
+    .audio-icon {
+        display: flex;
+        align-items: flex-end;
+        height: 20px;
+        margin-left: 15px;
+        margin-right: 5px;
+    }
+    .bar {
+        width: 4px;
+        background-color: #000;
+        margin: 0 2px;
+        border-radius: 2px;
+        animation: 0.8s infinite alternate sound;
+    }
+    .bar:first-child {
+        height: 60%;
+        animation-delay: 0.2s;
+    }
+    .bar:nth-child(2) {
+        height: 100%;
+        animation-delay: 0.4s;
+    }
+    .bar:nth-child(3) {
+        height: 80%;
+        animation-delay: 0.6s;
+    }
+    @keyframes sound {
+        0% {
+            opacity: 0.35;
+            height: 20%;
+        }
+        100% {
+            opacity: 1;
+            height: 100%;
+        }
+    }
+    .youtube-video {
+        aspect-ratio: 16/9;
+        width: 100%;
+    }
+    .text-pre-show {
+        position: absolute;
+        right: 15px;
+        top: 14px;
+        display: flex;
+        line-height: 23px;
+    }
+    .live-listen-section.dark-bg h2.section-heading {
+        color: #fff;
+        border-bottom-color: rgb(255 255 255 / 17%);
+        line-height: 20px;
+        font-size: 1.3em;
+        font-weight: 700;
+        text-transform: capitalize;
+        letter-spacing: 0.8px;
+    }
+    .live-listen-section.dark-bg .text-pre-show,
+    .live-listen-section.dark-bg h2 {
+        color: #fff;
+    }
+    .live-listen-section.dark-bg .bar {
+        background-color: #fff;
+    }
+    @media screen and (max-width: 480px) {
+        .text-pre-show {
+            position: relative;
+            right: 0;
+            top: 0;
+            margin-top: 3px !important;
+            margin-bottom: 3px !important;
+        }
+        .audio-icon {
+            margin-left: 0;
+            margin-right: 5px;
+        }
+    }
+</style>

@@ -1,0 +1,7 @@
+name = "sportscage-live-youtube"
+main = "src/worker.js"
+compatibility_date = "2026-11-25"
+account_id = "3bc447b37c612de5c3eefb836c19981b"
+
+# Secret (wrangler secret put — never commit):
+#   YOUTUBE_API_KEY

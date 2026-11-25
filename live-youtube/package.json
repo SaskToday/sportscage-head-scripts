@@ -1,0 +1,12 @@
+{
+  "name": "sportscage-live-youtube",
+  "private": true,
+  "description": "Cloudflare Worker that builds the SportsCage YouTube RSS feed for the homepage embed.",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^4.34.0"
+  }
+}
